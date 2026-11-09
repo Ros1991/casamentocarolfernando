@@ -104,6 +104,25 @@ export const reactions = sqliteTable(
   (t) => [primaryKey({ columns: [t.messageId, t.guestId, t.emoji] })],
 );
 
+/** Assinaturas de Web Push (um aparelho/navegador por linha). */
+export const pushSubscriptions = sqliteTable(
+  'push_subscriptions',
+  {
+    id: text('id').primaryKey(),
+    guestId: text('guest_id')
+      .notNull()
+      .references(() => guests.id),
+    endpoint: text('endpoint').notNull().unique(),
+    p256dh: text('p256dh').notNull(),
+    auth: text('auth').notNull(),
+    userAgent: text('user_agent'),
+    createdAt: integer('created_at').notNull(),
+    lastNotifiedAt: integer('last_notified_at'),
+  },
+  (t) => [index('push_guest_idx').on(t.guestId)],
+);
+
+export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
 export type Accommodation = typeof accommodations.$inferSelect;
 export type Guest = typeof guests.$inferSelect;
 export type Photo = typeof photos.$inferSelect;

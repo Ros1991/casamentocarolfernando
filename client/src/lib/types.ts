@@ -37,6 +37,7 @@ export interface AppConfig {
   telaoEnabled: boolean;
   wedding: Wedding;
   map: { tileUrl: string; attribution: string };
+  push: { enabled: boolean; publicKey: string | null };
   accommodations: Accommodation[];
 }
 

@@ -16,7 +16,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Countdown } from '../components/Countdown';
+import { InstallBanner } from '../components/InstallBanner';
 import { Monogram } from '../components/Monogram';
+import { NotificationsCard } from '../components/NotificationsCard';
 import { PhotoCapture } from '../components/PhotoCapture';
 import { addDays, countPeople, firstName, formatDateShort, toDateOnly } from '../lib/format';
 import { warmUpLocationPermission } from '../lib/geo';
@@ -107,6 +109,8 @@ export function Home() {
       </section>
 
       <div className="space-y-4 px-4 pt-4">
+        <InstallBanner />
+        <NotificationsCard dismissable />
         {!hintDismissed && (
           <div className="flex items-start gap-3 rounded-3xl border border-sky bg-sky-light p-4 animate-fade-in">
             <span className="rounded-full bg-cream p-2 text-olive-dark">

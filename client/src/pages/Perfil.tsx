@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { CompanionsInput } from '../components/CompanionsInput';
+import { NotificationsCard } from '../components/NotificationsCard';
 import { StayPicker } from '../components/StayPicker';
 import { errorMessage } from '../lib/api';
 import { formatPhone } from '../lib/format';
@@ -181,6 +182,8 @@ export function Perfil() {
       <button type="button" onClick={save} disabled={saving} className="w-full rounded-2xl bg-olive-dark py-4 text-lg font-semibold text-cream shadow-soft hover:bg-olive disabled:opacity-60">
         {saving ? 'Salvando…' : 'Salvar alterações'}
       </button>
+
+      <NotificationsCard />
 
       <section className="rounded-3xl border border-sand bg-white/60 p-4">
         <button type="button" onClick={() => setShowInstall((v) => !v)} className="flex w-full items-center gap-2 text-left font-semibold text-olive-dark">

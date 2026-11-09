@@ -267,7 +267,7 @@ Seguir o site oficial para o convidado sentir que é "o mesmo casamento":
 - Extras (09/11): código do convite pela URL (`?codigo=`) e no QR do telão; **acompanhantes** (casal/família) cadastrados pelo convidado, contando nos números do mapa, das chegadas e do admin.
 - Infra: Dockerfile, railway.json, workflow do GitHub Actions (build + deploy opcional via token), PWA (manifest e ícones).
 
-**Fora desta rodada:** notificações push (Web Push exige VAPID + service worker e, no iPhone, o site instalado na tela inicial; o mural já mostra contador de não lidas). Pode entrar depois do beta se fizer sentido.
+- Extras (09/11, tarde): botão "Apagar" evidente e moderação de fotos no admin; **app instalável** (service worker + convite de instalação; passo a passo no iPhone) e **avisos de novas mensagens** via Web Push (no iPhone só com o app instalado, regra da Apple), com aviso local quando o app está em segundo plano.
 
 **Deploy (09/11/2026):** código no GitHub (`Ros1991/casamentocarolfernando`) e projeto `galera-casamento` no Railway com serviço ligado ao repositório, volume em `/data`, variáveis e domínio <https://galera-production.up.railway.app>. Configuração em `.railway/railway.ts` (o `railway.json` foi aposentado pelo Railway). Códigos do convite/telão e telefones de admin estão **provisórios**.
 

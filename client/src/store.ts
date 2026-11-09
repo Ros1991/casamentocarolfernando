@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { api } from './lib/api';
+import { api, ApiError } from './lib/api';
+import { firstName } from './lib/format';
+import { showLocalNotification, unsubscribePush } from './lib/push';
 import { disconnectSocket, getSocket } from './lib/socket';
 import type { AppConfig, EnterPayload, GuestMe, GuestPublic, Message, Photo, Reaction, StayInput } from './lib/types';
 
@@ -125,12 +127,26 @@ export const useStore = create<State>((set, get) => ({
   },
 
   async loadMe() {
-    try {
-      const res = await api<MeResponse>('/api/auth/me');
-      set({ me: res.guest, isAdmin: res.isAdmin, authStatus: 'authed' });
-      get().connectSocket();
-    } catch {
-      set({ me: null, isAdmin: false, authStatus: 'anon' });
+    // Só considera "não logado" com 401. Erro de rede ou do servidor: tenta de novo antes de desistir,
+    // para uma oscilação de sinal não mandar a pessoa de volta para a tela de entrada.
+    const delays = [1500, 3000, 5000, 8000];
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const res = await api<MeResponse>('/api/auth/me');
+        set({ me: res.guest, isAdmin: res.isAdmin, authStatus: 'authed' });
+        get().connectSocket();
+        return;
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          set({ me: null, isAdmin: false, authStatus: 'anon' });
+          return;
+        }
+        if (attempt >= delays.length) {
+          set({ me: null, isAdmin: false, authStatus: 'anon' });
+          return;
+        }
+        await new Promise((r) => setTimeout(r, delays[attempt]));
+      }
     }
   },
 
@@ -143,6 +159,7 @@ export const useStore = create<State>((set, get) => ({
 
   async logout() {
     try {
+      await unsubscribePush();
       await api('/api/auth/logout', { method: 'POST' });
     } finally {
       disconnectSocket();
@@ -298,6 +315,12 @@ export const useStore = create<State>((set, get) => ({
           unreadMural: !muralActive && m.guestId !== me?.id ? s.unreadMural + 1 : s.unreadMural,
           typing: Object.fromEntries(Object.entries(s.typing).filter(([id]) => id !== m.guestId)),
         }));
+        // App aberto em segundo plano: aviso local (o push do servidor cobre o app fechado)
+        if (m.guestId !== me?.id && typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+          const author = firstName(m.guest.name);
+          const body = m.photo ? `${author} postou uma foto 📸` : `${author}: ${m.text ?? ''}`;
+          void showLocalNotification('Galera do casamento', body.slice(0, 180));
+        }
       });
 
       socket.on('message:deleted', ({ id, photoId }: { id: number | null; photoId: string | null }) => {

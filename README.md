@@ -42,6 +42,13 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 | `MAX_UPLOAD_MB` | não | Limite por foto (padrão 12) |
 | `PUBLIC_URL` | recomendado | URL pública (usada no QR code do telão) |
 | `MAP_TILE_URL` / `MAP_TILE_ATTRIBUTION` | não | Troca o provedor de tiles do mapa (padrão OpenStreetMap) |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | para avisos | Chaves do Web Push (avisos de novas mensagens). Sem elas, os avisos ficam desligados |
+
+## App instalável e avisos
+
+- O site é um PWA: no Android/Chrome aparece um convite "Instalar o app" no Início (diálogo nativo); no iPhone o Safari não oferece esse botão, então o Início mostra o passo a passo (Compartilhar → Adicionar à Tela de Início). Instalado, abre em tela cheia pelo ícone.
+- **Avisos de mensagens** (Web Push): o convidado ativa no Início ou no Perfil. Quem está com o app fechado recebe um aviso quando alguém posta no mural, no máximo um a cada 2 minutos por aparelho; quem está com o app aberto em segundo plano recebe um aviso local. No iPhone, só funciona com o app instalado na tela inicial (regra da Apple, iOS 16.4+).
+- O service worker (`client/public/sw.js`) não intercepta `/api`, `/uploads` nem `/socket.io`; guarda em cache só os assets com hash e a casca do app.
 
 ## Deploy no Railway
 
