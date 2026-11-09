@@ -18,17 +18,22 @@ export default defineRailway(() => {
     healthcheck: "/health",
     healthcheckTimeout: 120,
     volumeMounts: { "/data": galeraVolume },
+    // Domínio próprio (CNAME criado no DNS do Canva). O domínio gerado pelo Railway continua ativo.
+    domains: [{ domain: "app.annacarolinaefernando.com", port: 3000 }],
     env: {
       PORT: "3000",
       NODE_ENV: "production",
       DATA_DIR: "/data",
       MAX_UPLOAD_MB: "12",
-      PUBLIC_URL: "https://galera-production.up.railway.app",
+      PUBLIC_URL: "https://app.annacarolinaefernando.com",
+      VAPID_SUBJECT: "https://app.annacarolinaefernando.com",
       // Segredos e códigos ficam só no Railway (Variables), nunca no repositório
       SESSION_SECRET: preserve(),
       INVITE_CODE: preserve(),
       ADMIN_PHONES: preserve(),
       TELAO_CODE: preserve(),
+      VAPID_PUBLIC_KEY: preserve(),
+      VAPID_PRIVATE_KEY: preserve(),
     },
   });
 

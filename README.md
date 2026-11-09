@@ -52,7 +52,7 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 
 ## Domínio
 
-Além do domínio do Railway, está registrado `app.annacarolinaefernando.com` (CNAME `app` → `vdx2u7zy.up.railway.app`, criado no DNS do domínio dos noivos). Quando o DNS propagar, trocar `PUBLIC_URL` e `VAPID_SUBJECT` para `https://app.annacarolinaefernando.com`.
+`app.annacarolinaefernando.com` é um CNAME (`app` → `vdx2u7zy.up.railway.app`) criado no DNS do domínio dos noivos, que fica no Canva (Configurações → Domínios da web → domínio → Configurações avançadas → Gerenciar → Registros DNS). O Railway emite e renova o certificado HTTPS sozinho. `PUBLIC_URL` e `VAPID_SUBJECT` apontam para esse domínio.
 
 ## App instalável e avisos
 
@@ -64,7 +64,7 @@ Além do domínio do Railway, está registrado `app.annacarolinaefernando.com` (
 
 O projeto já está no ar: **projeto `galera-casamento`**, serviço **`galera`**, ligado ao repositório `Ros1991/casamentocarolfernando` (branch `main`). **Todo push na `main` faz deploy automaticamente.**
 
-- URL: <https://galera-production.up.railway.app>
+- URL oficial: <https://app.annacarolinaefernando.com> (o endereço <https://galera-production.up.railway.app> continua funcionando)
 - Região `us-east4` (Virgínia, a de menor latência para o Brasil entre as disponíveis).
 - Volume `galera-data` montado em `/data` (banco `galera.db` + `uploads/`).
 - Variáveis cadastradas no serviço (ver tabela acima). Troque `INVITE_CODE`, `ADMIN_PHONES` e `TELAO_CODE` pelos valores definitivos no painel do Railway (Variables) ou com `railway variables --set "CHAVE=valor"`.
