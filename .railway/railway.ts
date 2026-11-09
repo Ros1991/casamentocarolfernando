@@ -4,10 +4,10 @@ import { defineRailway, github, preserve, project, service, volume } from "railw
 
 export default defineRailway(() => {
   // Banco SQLite (galera.db) e fotos (uploads/) ficam neste volume, montado em /data.
-  const galeraVolume = volume("galera-volume", {
+  const galeraVolume = volume("galera-data", {
     alerts: { usage: { "100": {}, "80": {}, "95": {} } },
     allowOnlineResize: true,
-    region: "us-east4",
+    region: "us-east4-eqdc4a",
     sizeMB: 50000,
   });
 
