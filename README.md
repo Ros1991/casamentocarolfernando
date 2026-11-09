@@ -36,7 +36,7 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 | `PORT` | não | Porta do servidor (o Railway injeta) |
 | `DATA_DIR` | não | Pasta do banco (`galera.db`) e das fotos (`uploads/`). Local: `./data`. Railway: `/data` |
 | `SESSION_SECRET` | **sim em produção** | Frase longa e aleatória que assina os cookies |
-| `INVITE_CODE` | recomendado | Código que os convidados digitam na entrada. Vazio = sem código |
+| `INVITE_CODE` | não | Código que os convidados digitam na entrada. **Está vazio (sem código)** por decisão dos noivos; defina uma palavra para passar a exigir |
 | `ADMIN_PHONES` | recomendado | Telefones (só dígitos, com 55) com acesso ao `/admin`, separados por vírgula |
 | `TELAO_CODE` | recomendado | Código para abrir `/telao` sem login |
 | `MAX_UPLOAD_MB` | não | Limite por foto (padrão 12) |
@@ -67,7 +67,7 @@ O projeto já está no ar: **projeto `galera-casamento`**, serviço **`galera`**
 - URL oficial: <https://app.annacarolinaefernando.com> (o endereço <https://galera-production.up.railway.app> continua funcionando)
 - Região `us-east4` (Virgínia, a de menor latência para o Brasil entre as disponíveis).
 - Volume `galera-data` montado em `/data` (banco `galera.db` + `uploads/`).
-- Variáveis cadastradas no serviço (ver tabela acima). Troque `INVITE_CODE`, `ADMIN_PHONES` e `TELAO_CODE` pelos valores definitivos no painel do Railway (Variables) ou com `railway variables --set "CHAVE=valor"`.
+- Variáveis cadastradas no serviço (ver tabela acima). `ADMIN_PHONES` tem os noivos e o Rodrigo; `INVITE_CODE` está desligado; `TELAO_CODE` pode ser trocado no painel do Railway (Variables) ou com `railway variables --set "CHAVE=valor"`.
 
 ### Infraestrutura como código (`.railway/railway.ts`)
 

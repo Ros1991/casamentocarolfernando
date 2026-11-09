@@ -29,7 +29,7 @@ export default defineRailway(() => {
       VAPID_SUBJECT: "https://app.annacarolinaefernando.com",
       // Segredos e códigos ficam só no Railway (Variables), nunca no repositório
       SESSION_SECRET: preserve(),
-      INVITE_CODE: preserve(),
+      // INVITE_CODE desligado a pedido dos noivos (sem código na entrada); para exigir, declare aqui e no Railway
       ADMIN_PHONES: preserve(),
       TELAO_CODE: preserve(),
       VAPID_PUBLIC_KEY: preserve(),
