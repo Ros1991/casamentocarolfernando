@@ -72,6 +72,22 @@ export function parseDates(body: Record<string, unknown>): DateFields | InputErr
   return { arrivalDate, departureDate };
 }
 
+export const MAX_COMPANIONS = 4;
+
+/** Lista de acompanhantes: nomes curtos, até MAX_COMPANIONS; entradas vazias viram "Acompanhante". */
+export function parseCompanions(value: unknown): string[] | InputError {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) return { error: 'companions', message: 'Lista de acompanhantes inválida.' };
+  const names = value
+    .filter((v): v is string => typeof v === 'string')
+    .map((v) => v.trim().slice(0, 40))
+    .map((v) => v || 'Acompanhante');
+  if (names.length > MAX_COMPANIONS) {
+    return { error: 'companions', message: `No máximo ${MAX_COMPANIONS} acompanhantes por pessoa.` };
+  }
+  return names;
+}
+
 export function isInputError(v: unknown): v is InputError {
   return !!v && typeof v === 'object' && 'error' in v && 'message' in v;
 }

@@ -7,7 +7,7 @@ import { guestMe, guestPublic } from '../dto.js';
 import { ImageError, processAvatar, removeUpload } from '../images.js';
 import { broadcast, onlineGuestIds } from '../realtime.js';
 import { bool, str } from '../validate.js';
-import { isInputError, parseDates, parseStay } from './guestInput.js';
+import { isInputError, parseCompanions, parseDates, parseStay } from './guestInput.js';
 
 export default async function guestRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/guests', { preHandler: requireGuest }, async () => ({
@@ -42,6 +42,11 @@ export default async function guestRoutes(app: FastifyInstance): Promise<void> {
       const v = bool(body.showPhone);
       if (v === null) return reply.code(400).send({ error: 'showPhone', message: 'Valor inválido.' });
       patch.showPhone = v;
+    }
+    if (body.companions !== undefined) {
+      const companions = parseCompanions(body.companions);
+      if (isInputError(companions)) return reply.code(400).send(companions);
+      patch.companions = companions;
     }
 
     if (Object.keys(patch).length > 0) {

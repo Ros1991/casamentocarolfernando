@@ -18,7 +18,7 @@ import { Avatar } from '../components/Avatar';
 import { Countdown } from '../components/Countdown';
 import { Monogram } from '../components/Monogram';
 import { PhotoCapture } from '../components/PhotoCapture';
-import { addDays, firstName, formatDateShort, toDateOnly } from '../lib/format';
+import { addDays, countPeople, firstName, formatDateShort, toDateOnly } from '../lib/format';
 import { warmUpLocationPermission } from '../lib/geo';
 import { toast } from '../lib/toast';
 import { useStore } from '../store';
@@ -136,8 +136,10 @@ export function Home() {
 
         <div className="grid grid-cols-3 gap-3">
           <Link to="/mapa" className="rounded-3xl border border-sand bg-white/60 p-3 text-center shadow-soft">
-            <div className="font-serif text-3xl font-semibold text-olive-dark">{guestList.length}</div>
-            <div className="text-[11px] font-semibold tracking-wider text-olive uppercase">na galera</div>
+            <div className="font-serif text-3xl font-semibold text-olive-dark">{countPeople(guestList)}</div>
+            <div className="text-[11px] font-semibold tracking-wider text-olive uppercase">
+              {countPeople(guestList) === 1 ? 'pessoa' : 'pessoas'}
+            </div>
           </Link>
           <Link to="/fotos" className="rounded-3xl border border-sand bg-white/60 p-3 text-center shadow-soft">
             <div className="font-serif text-3xl font-semibold text-olive-dark">{photos.length}</div>
@@ -175,7 +177,7 @@ export function Home() {
                   ))}
                 </div>
                 <span className="text-sm text-ink-soft">
-                  {inTown.length === 1 ? '1 pessoa já está por lá' : `${inTown.length} pessoas já estão por lá`}
+                  {countPeople(inTown) === 1 ? '1 pessoa já está por lá' : `${countPeople(inTown)} pessoas já estão por lá`}
                 </span>
               </div>
             )}

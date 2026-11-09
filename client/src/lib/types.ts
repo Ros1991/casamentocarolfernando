@@ -55,6 +55,10 @@ export interface GuestPublic extends GuestLite {
   arrivalDate: string | null;
   departureDate: string | null;
   whatsapp: string | null;
+  /** Quem vem junto (nomes) */
+  companions: string[];
+  /** 1 + acompanhantes */
+  partySize: number;
   isAdmin: boolean;
   createdAt: number;
   lastSeenAt: number;
@@ -116,8 +120,11 @@ export interface EnterPayload extends StayInput {
   inviteCode: string;
   arrivalDate: string | null;
   departureDate: string | null;
+  companions: string[];
   showPhone: boolean;
 }
+
+export const MAX_COMPANIONS = 4;
 
 export const EMOJIS = ['❤️', '😂', '🥹', '🔥', '👏', '🙌'];
 

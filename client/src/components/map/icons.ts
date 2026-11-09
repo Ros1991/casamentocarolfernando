@@ -14,7 +14,19 @@ export type PlaceKind = 'venue' | 'preset' | 'custom';
  * Pino de lugar (hotel, local da festa ou "outro lugar").
  * `compact` esconde o rótulo (usado com o mapa afastado, para os pinos não se sobreporem).
  */
+const placeIconCache = new Map<string, L.DivIcon>();
+
 export function placeIcon(label: string, count: number, kind: PlaceKind, compact = false): L.DivIcon {
+  // Mesmo objeto para os mesmos parâmetros: evita o react-leaflet trocar o DOM do pino a cada render
+  const key = `${kind}|${compact ? 1 : 0}|${count}|${label}`;
+  const cached = placeIconCache.get(key);
+  if (cached) return cached;
+  const created = buildPlaceIcon(label, count, kind, compact);
+  placeIconCache.set(key, created);
+  return created;
+}
+
+function buildPlaceIcon(label: string, count: number, kind: PlaceKind, compact: boolean): L.DivIcon {
   const icon = kind === 'venue' ? RINGS : kind === 'custom' ? HOME : BED;
   const classes = ['pin-place'];
   if (kind === 'venue') classes.push('pin-venue');

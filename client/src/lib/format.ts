@@ -106,3 +106,27 @@ export function whatsappLink(phone: string, text?: string): string {
 export function pluralize(n: number, singular: string, plural: string): string {
   return `${n} ${n === 1 ? singular : plural}`;
 }
+
+/** "Marina" / "Marina e João" / "Marina, João e Ana" */
+export function joinNames(names: string[]): string {
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
+}
+
+/** "Rodrigo e Marina" / "Rodrigo, Marina e João" */
+export function partyLabel(name: string, companions: string[] | undefined): string {
+  if (!companions || companions.length === 0) return name;
+  return joinNames([name, ...companions]);
+}
+
+/** "+1", "+2"… ou null quando vem sozinho */
+export function companionBadge(companions: string[] | undefined): string | null {
+  const n = companions?.length ?? 0;
+  return n > 0 ? `+${n}` : null;
+}
+
+/** Total de pessoas numa lista de convidados (cada um conta 1 + acompanhantes). */
+export function countPeople(list: { companions?: string[] }[]): number {
+  return list.reduce((sum, g) => sum + 1 + (g.companions?.length ?? 0), 0);
+}

@@ -17,7 +17,7 @@ import { normalizePhone } from '../phone.js';
 import { broadcast } from '../realtime.js';
 import { bool, str } from '../validate.js';
 import { WEDDING } from '../wedding.js';
-import { isInputError, parseDates, parseStay } from './guestInput.js';
+import { isInputError, parseCompanions, parseDates, parseStay } from './guestInput.js';
 
 export default async function authRoutes(app: FastifyInstance): Promise<void> {
   /** Dados públicos: se exige código, infos do casamento e hospedagens (para a tela de entrada). */
@@ -56,6 +56,8 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       if (isInputError(stay)) return reply.code(400).send(stay);
       const dates = parseDates(body);
       if (isInputError(dates)) return reply.code(400).send(dates);
+      const companions = parseCompanions(body.companions);
+      if (isInputError(companions)) return reply.code(400).send(companions);
       const showPhone = bool(body.showPhone) ?? false;
 
       const now = Date.now();
@@ -64,13 +66,13 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
       if (existing) {
         guestId = existing.id;
         db.update(guests)
-          .set({ name, ...stay, ...dates, showPhone, lastSeenAt: now })
+          .set({ name, ...stay, ...dates, companions, showPhone, lastSeenAt: now })
           .where(eq(guests.id, guestId))
           .run();
       } else {
         guestId = crypto.randomUUID();
         db.insert(guests)
-          .values({ id: guestId, name, phone, ...stay, ...dates, showPhone, createdAt: now, lastSeenAt: now })
+          .values({ id: guestId, name, phone, ...stay, ...dates, companions, showPhone, createdAt: now, lastSeenAt: now })
           .run();
       }
 

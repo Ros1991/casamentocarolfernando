@@ -1,6 +1,7 @@
-import { CalendarDays, Check, KeyRound, Phone, UserRound } from 'lucide-react';
+import { CalendarDays, Check, KeyRound, Phone, UserRound, Users } from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { CompanionsInput } from '../components/CompanionsInput';
 import { Monogram } from '../components/Monogram';
 import { Splash } from '../components/Splash';
 import { StayPicker } from '../components/StayPicker';
@@ -71,6 +72,7 @@ export function Enter() {
   const [departureDate, setDepartureDate] = useState('');
   const [inviteCode, setInviteCode] = useState(inviteFromLink);
   const [showInviteField, setShowInviteField] = useState(!inviteFromLink);
+  const [companions, setCompanions] = useState<string[]>([]);
   const [showPhone, setShowPhone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +109,7 @@ export function Enter() {
         ...stay,
         arrivalDate: arrivalDate || null,
         departureDate: departureDate || null,
+        companions: companions.map((c) => c.trim()).filter(Boolean),
         showPhone,
       });
       toast.success(returning ? `Bem-vindo(a) de volta, ${name.trim().split(' ')[0]}!` : `Bem-vindo(a), ${name.trim().split(' ')[0]}! 🎉`);
@@ -177,6 +180,14 @@ export function Enter() {
               <span>Mostrar meu WhatsApp para os outros convidados (para combinar carona, passeio…)</span>
             </label>
           </label>
+        </div>
+
+        <div className="space-y-3 rounded-3xl border border-sand bg-cream p-5 shadow-soft">
+          <h2 className="flex items-center gap-2 font-serif text-2xl font-semibold text-olive-dark">
+            <Users size={22} /> Vem alguém com você?
+          </h2>
+          <p className="text-sm text-ink-soft">Casal, filhos, família: adicione quem vem junto e eles já contam com você.</p>
+          <CompanionsInput value={companions} onChange={setCompanions} />
         </div>
 
         <div className="space-y-4 rounded-3xl border border-sand bg-cream p-5 shadow-soft">

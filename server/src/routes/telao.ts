@@ -4,6 +4,7 @@ import { hasTelaoAccess, setTelaoCookie } from '../auth.js';
 import { config } from '../config.js';
 import { db } from '../db/index.js';
 import { guests, photos } from '../db/schema.js';
+import { countPeople } from '../dto.js';
 import { loadPhotos } from '../queries.js';
 import { str } from '../validate.js';
 import { WEDDING } from '../wedding.js';
@@ -27,11 +28,11 @@ export default async function telaoRoutes(app: FastifyInstance): Promise<void> {
     if (!hasTelaoAccess(request)) {
       return reply.code(401).send({ error: 'unauthorized', message: 'Informe o código do telão.' });
     }
-    const guestCount = db.select({ n: count() }).from(guests).get()?.n ?? 0;
+    const guestRows = db.select({ companions: guests.companions }).from(guests).all();
     const photoCount = db.select({ n: count() }).from(photos).where(isNull(photos.deletedAt)).get()?.n ?? 0;
     return {
       photos: loadPhotos(150),
-      stats: { guests: guestCount, photos: photoCount },
+      stats: { guests: guestRows.length, people: countPeople(guestRows), photos: photoCount },
       wedding: WEDDING,
       publicUrl: config.publicUrl,
       // Vai no QR code: quem escaneia entra sem digitar o código (o telão já é protegido)

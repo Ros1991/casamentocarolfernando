@@ -2,7 +2,7 @@ import { CalendarDays, PlaneLanding, PlaneTakeoff } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
-import { addDays, daysBetween, formatDateLong, formatDateShort } from '../lib/format';
+import { addDays, companionBadge, countPeople, daysBetween, formatDateLong, formatDateShort, partyLabel } from '../lib/format';
 import type { GuestPublic } from '../lib/types';
 import { useStore } from '../store';
 
@@ -35,7 +35,7 @@ export function Chegadas() {
     start = addDays(start, -1);
     end = addDays(end, 1);
     const span = Math.min(45, Math.max(3, daysBetween(start, end)));
-    const result: { date: string; present: GuestPublic[]; arriving: GuestPublic[]; leaving: GuestPublic[] }[] = [];
+    const result: { date: string; present: GuestPublic[]; presentCount: number; arriving: GuestPublic[]; leaving: GuestPublic[] }[] = [];
     let max = 0;
     for (let i = 0; i <= span; i++) {
       const date = addDays(start, i);
@@ -46,8 +46,9 @@ export function Chegadas() {
       });
       const arriving = withDates.filter((g) => g.arrivalDate === date);
       const leaving = withDates.filter((g) => g.departureDate === date);
-      max = Math.max(max, present.length);
-      result.push({ date, present, arriving, leaving });
+      const presentCount = countPeople(present);
+      max = Math.max(max, presentCount);
+      result.push({ date, present, presentCount, arriving, leaving });
     }
     return { days: result, maxCount: max };
   }, [withDates]);
@@ -83,22 +84,24 @@ export function Chegadas() {
             <ul className="space-y-1.5">
               {days.map((d) => {
                 const isWedding = d.date === WEDDING_DAY;
-                const pct = maxCount ? (d.present.length / maxCount) * 100 : 0;
+                const pct = maxCount ? (d.presentCount / maxCount) * 100 : 0;
                 return (
                   <li key={d.date} className="flex items-center gap-2 text-xs">
                     <span className={`w-16 shrink-0 ${isWedding ? 'font-bold text-rose' : 'text-ink-soft'}`}>{formatDateShort(d.date)}</span>
                     <span className="h-5 flex-1 overflow-hidden rounded-full bg-cream-dark">
                       <span
                         className={`block h-full rounded-full ${isWedding ? 'bg-rose' : 'bg-olive'}`}
-                        style={{ width: `${Math.max(d.present.length ? 6 : 0, pct)}%` }}
+                        style={{ width: `${Math.max(d.presentCount ? 6 : 0, pct)}%` }}
                       />
                     </span>
-                    <span className="w-6 text-right font-semibold text-olive-dark tabular-nums">{d.present.length}</span>
+                    <span className="w-6 text-right font-semibold text-olive-dark tabular-nums">{d.presentCount}</span>
                   </li>
                 );
               })}
             </ul>
-            <p className="mt-2 text-[11px] text-ink-soft">Quem não informou a saída conta como presente até o dia da festa.</p>
+            <p className="mt-2 text-[11px] text-ink-soft">
+              Acompanhantes contam junto. Quem não informou a saída conta como presente até o dia da festa.
+            </p>
           </section>
 
           <section className="space-y-3">
@@ -155,9 +158,9 @@ function GuestChips({ guests, meId, placeOf }: { guests: GuestPublic[]; meId?: s
         const place = placeOf(g);
         return (
           <li key={g.id} className="flex items-center gap-2.5">
-            <Avatar guest={g} size={28} />
+            <Avatar guest={g} size={28} badge={companionBadge(g.companions)} />
             <span className="min-w-0 flex-1 truncate text-sm">
-              <span className={`font-semibold ${g.id === meId ? 'text-olive' : 'text-ink'}`}>{g.name}</span>
+              <span className={`font-semibold ${g.id === meId ? 'text-olive' : 'text-ink'}`}>{partyLabel(g.name, g.companions)}</span>
               {place && <span className="text-ink-soft"> · {place}</span>}
             </span>
           </li>

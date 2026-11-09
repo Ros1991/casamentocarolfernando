@@ -1,7 +1,8 @@
-import { Camera, LogOut, ShieldCheck, Smartphone, Trash2 } from 'lucide-react';
+import { Camera, LogOut, ShieldCheck, Smartphone, Trash2, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
+import { CompanionsInput } from '../components/CompanionsInput';
 import { StayPicker } from '../components/StayPicker';
 import { errorMessage } from '../lib/api';
 import { formatPhone } from '../lib/format';
@@ -28,6 +29,7 @@ export function Perfil() {
   const [stay, setStay] = useState<StayInput | null>(null);
   const [arrivalDate, setArrivalDate] = useState('');
   const [departureDate, setDepartureDate] = useState('');
+  const [companions, setCompanions] = useState<string[]>([]);
   const [showPhone, setShowPhone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
@@ -39,6 +41,7 @@ export function Perfil() {
     setName(me.name);
     setArrivalDate(me.arrivalDate ?? '');
     setDepartureDate(me.departureDate ?? '');
+    setCompanions(me.companions ?? []);
     setShowPhone(me.showPhone);
     setStay({
       stayMode: me.accommodationId ? 'preset' : me.customPlaceLabel ? 'custom' : 'unknown',
@@ -65,6 +68,7 @@ export function Perfil() {
         ...stay,
         arrivalDate: arrivalDate || null,
         departureDate: departureDate || null,
+        companions: companions.map((c) => c.trim()).filter(Boolean),
         showPhone,
       });
       toast.success('Perfil atualizado!');
@@ -111,7 +115,7 @@ export function Perfil() {
     <div className="space-y-5 px-4 pt-5 pb-10">
       <div className="flex items-center gap-4">
         <div className="relative">
-          <Avatar guest={me} size={84} />
+          <Avatar guest={me} size={84} badge={me.companions?.length ? `+${me.companions.length}` : null} />
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
@@ -146,6 +150,13 @@ export function Perfil() {
             <span className="block text-xs text-ink-soft">Aparece um botão de conversa ao lado do seu nome no mapa e nas chegadas.</span>
           </span>
         </label>
+      </section>
+
+      <section className="space-y-3 rounded-3xl border border-sand bg-cream p-5 shadow-soft">
+        <h2 className="flex items-center gap-2 font-serif text-2xl font-semibold text-olive-dark">
+          <Users size={22} /> Quem vem comigo
+        </h2>
+        <CompanionsInput value={companions} onChange={setCompanions} />
       </section>
 
       <section className="space-y-4 rounded-3xl border border-sand bg-cream p-5 shadow-soft">

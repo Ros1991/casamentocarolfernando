@@ -264,6 +264,7 @@ Seguir o site oficial para o convidado sentir que é "o mesmo casamento":
 
 - Fase 1 completa: entrada (com chegada/saída), início, mural em tempo real, foto com GPS/EXIF/ajuste manual e compressão no celular, mapa com hospedagens e fotos agrupadas, galeria, perfil com avatar, admin (CSV).
 - Fase 2: telão da festa com QR code, reações, "quem chega quando" com gráfico por dia, fila offline de fotos, download de todas as fotos em .zip.
+- Extras (09/11): código do convite pela URL (`?codigo=`) e no QR do telão; **acompanhantes** (casal/família) cadastrados pelo convidado, contando nos números do mapa, das chegadas e do admin.
 - Infra: Dockerfile, railway.json, workflow do GitHub Actions (build + deploy opcional via token), PWA (manifest e ícones).
 
 **Fora desta rodada:** notificações push (Web Push exige VAPID + service worker e, no iPhone, o site instalado na tela inicial; o mural já mostra contador de não lidas). Pode entrar depois do beta se fizer sentido.

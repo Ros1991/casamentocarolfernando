@@ -14,6 +14,7 @@ export interface ProfilePatch extends Partial<StayInput> {
   name?: string;
   arrivalDate?: string | null;
   departureDate?: string | null;
+  companions?: string[];
   showPhone?: boolean;
 }
 

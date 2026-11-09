@@ -10,7 +10,7 @@ import type { Message, Photo, Wedding } from '../lib/types';
 
 interface Feed {
   photos: Photo[];
-  stats: { guests: number; photos: number };
+  stats: { guests: number; people: number; photos: number };
   wedding: Wedding;
   publicUrl: string;
   inviteCode: string | null;
@@ -206,7 +206,7 @@ export function Telao() {
             <div className="text-[11px] font-semibold tracking-widest text-cream/60 uppercase">fotos</div>
           </div>
           <div className="rounded-2xl bg-white/5 p-3">
-            <div className="font-serif text-4xl font-semibold">{feed.stats.guests}</div>
+            <div className="font-serif text-4xl font-semibold">{feed.stats.people ?? feed.stats.guests}</div>
             <div className="text-[11px] font-semibold tracking-widest text-cream/60 uppercase">na galera</div>
           </div>
         </div>

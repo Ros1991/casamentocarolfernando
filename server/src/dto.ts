@@ -19,6 +19,10 @@ export interface GuestPublicDTO extends GuestLiteDTO {
   departureDate: string | null;
   /** Só preenchido quando o convidado permitiu mostrar */
   whatsapp: string | null;
+  /** Quem vem junto (nomes) */
+  companions: string[];
+  /** 1 + acompanhantes */
+  partySize: number;
   isAdmin: boolean;
   createdAt: number;
   lastSeenAt: number;
@@ -75,10 +79,17 @@ export function guestPublic(g: Guest): GuestPublicDTO {
     arrivalDate: g.arrivalDate,
     departureDate: g.departureDate,
     whatsapp: g.showPhone ? g.phone : null,
+    companions: g.companions ?? [],
+    partySize: 1 + (g.companions?.length ?? 0),
     isAdmin: isAdmin(g),
     createdAt: g.createdAt,
     lastSeenAt: g.lastSeenAt,
   };
+}
+
+/** Total de pessoas (convidados + acompanhantes) de uma lista de convidados. */
+export function countPeople(list: Pick<Guest, 'companions'>[]): number {
+  return list.reduce((sum, g) => sum + 1 + (g.companions?.length ?? 0), 0);
 }
 
 export function guestMe(g: Guest): GuestMeDTO {

@@ -13,9 +13,11 @@ interface Props {
   size?: number;
   className?: string;
   online?: boolean;
+  /** Ex.: "+1" para quem vem acompanhado */
+  badge?: string | null;
 }
 
-export function Avatar({ guest, size = 36, className = '', online }: Props) {
+export function Avatar({ guest, size = 36, className = '', online, badge }: Props) {
   const style = { width: size, height: size, fontSize: Math.max(10, size * 0.38) };
   return (
     <span className={`relative inline-block shrink-0 ${className}`} style={{ width: size, height: size }}>
@@ -41,6 +43,14 @@ export function Avatar({ guest, size = 36, className = '', online }: Props) {
           className="absolute -right-0.5 -bottom-0.5 block size-3 rounded-full bg-emerald-500 ring-2 ring-cream"
           title="Online agora"
         />
+      )}
+      {badge && (
+        <span
+          className="absolute -top-1 -right-1.5 rounded-full bg-rose px-1 text-[9px] leading-[14px] font-bold text-cream ring-2 ring-cream"
+          title="Acompanhantes"
+        >
+          {badge}
+        </span>
       )}
     </span>
   );

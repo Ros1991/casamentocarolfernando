@@ -9,6 +9,7 @@ import { useStore } from '../store';
 
 interface Stats {
   guests: number;
+  people: number;
   photos: number;
   messages: number;
   online: number;
@@ -64,8 +65,9 @@ export function Admin() {
       {error && <div className="rounded-2xl bg-rose/10 px-4 py-3 text-sm font-semibold text-rose">{error}</div>}
 
       {stats && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat icon={<Users size={16} />} label="Convidados" value={stats.guests} />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <Stat icon={<Users size={16} />} label="Cadastros" value={stats.guests} />
+          <Stat icon={<Users size={16} />} label="Pessoas" value={stats.people} />
           <Stat icon={<Images size={16} />} label="Fotos" value={stats.photos} />
           <Stat icon={<MessageCircle size={16} />} label="Mensagens" value={stats.messages} />
           <Stat icon={<span className="size-2 rounded-full bg-emerald-500" />} label="Online" value={stats.online} />
@@ -101,7 +103,11 @@ export function Admin() {
                 <div className="flex flex-wrap items-center gap-x-2">
                   <span className="font-semibold text-ink">{g.name}</span>
                   {g.isAdmin && <span className="rounded-full bg-olive-pale px-2 text-[10px] font-bold text-olive-dark uppercase">admin</span>}
+                  {g.companions?.length > 0 && (
+                    <span className="rounded-full bg-rose/10 px-2 text-[10px] font-bold text-rose uppercase">+{g.companions.length}</span>
+                  )}
                 </div>
+                {g.companions?.length > 0 && <div className="text-ink-soft">Com {g.companions.join(', ')}</div>}
                 <div className="text-ink-soft">
                   <a href={whatsappLink(g.phone)} target="_blank" rel="noreferrer" className="underline">
                     {g.phoneFormatted}

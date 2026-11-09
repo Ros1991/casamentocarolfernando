@@ -9,7 +9,7 @@ import { PhotoViewer } from '../components/PhotoViewer';
 import { BaseMap, FitBounds, FlyTo } from '../components/map/MapBase';
 import { PhotoClusterLayer } from '../components/map/PhotoClusterLayer';
 import { placeIcon } from '../components/map/icons';
-import { firstName, formatDayMonth, whatsappLink } from '../lib/format';
+import { companionBadge, countPeople, firstName, formatDayMonth, joinNames, whatsappLink } from '../lib/format';
 import type { Accommodation, GuestPublic, Photo } from '../lib/types';
 import { useStore } from '../store';
 
@@ -139,7 +139,7 @@ export function Mapa() {
 
         {showPeople &&
           accommodations.map((a) => {
-            const count = guestsByAcc.get(a.id)?.length ?? 0;
+            const count = countPeople(guestsByAcc.get(a.id) ?? []);
             const kind = a.type === 'evento' ? 'venue' : 'preset';
             return (
               <Marker
@@ -157,7 +157,7 @@ export function Mapa() {
             <Marker
               key={g.id}
               position={[g.customLat!, g.customLng!]}
-              icon={placeIcon(firstName(g.name), 0, 'custom', compact)}
+              icon={placeIcon(firstName(g.name), g.companions?.length ? g.partySize : 0, 'custom', compact)}
               eventHandlers={{ click: () => setSheet({ kind: 'custom', guest: g }) }}
             />
           ))}
@@ -243,9 +243,9 @@ export function Mapa() {
                   <Users size={18} />
                   {sheetGuests.length === 0
                     ? 'Ninguém por aqui ainda'
-                    : sheetGuests.length === 1
+                    : countPeople(sheetGuests) === 1
                       ? '1 pessoa fica aqui'
-                      : `${sheetGuests.length} pessoas ficam aqui`}
+                      : `${countPeople(sheetGuests)} pessoas ficam aqui`}
                 </div>
                 <GuestRows guests={sheetGuests} meId={me?.id} online={online} />
               </div>
@@ -272,7 +272,7 @@ export function Mapa() {
                   <button type="button" onClick={() => focusOn(a.lat, a.lng)} className="mb-1.5 flex w-full items-baseline justify-between text-left">
                     <span className="font-serif text-lg font-semibold text-olive-dark">{a.name}</span>
                     <span className="text-xs text-ink-soft">
-                      {a.city} · {list.length}
+                      {a.city} · {countPeople(list)}
                     </span>
                   </button>
                   {list.length > 0 ? <GuestRows guests={list} meId={me?.id} online={online} compact /> : <p className="text-xs text-ink-soft">Ninguém ainda.</p>}
@@ -344,22 +344,18 @@ function GuestRows({
       {guests.map((g) => {
         const dates = datesLabel(g);
         const sub = subtitle?.(g);
+        const withCompanions = g.companions?.length ? `com ${joinNames(g.companions)}` : '';
+        const details = [withCompanions, sub, dates].filter(Boolean).join(' · ');
         return (
           <li key={g.id} className={`flex items-center gap-3 ${compact ? 'py-1.5' : 'py-2.5'}`}>
             <button type="button" onClick={() => onPick?.(g)} className="flex min-w-0 flex-1 items-center gap-3 text-left" disabled={!onPick}>
-              <Avatar guest={g} size={compact ? 30 : 38} online={online.includes(g.id)} />
+              <Avatar guest={g} size={compact ? 30 : 38} online={online.includes(g.id)} badge={companionBadge(g.companions)} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold text-ink">
                   {g.name}
                   {g.id === meId && <span className="ml-1 text-xs font-normal text-olive">(você)</span>}
                 </span>
-                {(sub || dates) && (
-                  <span className="block truncate text-xs text-ink-soft">
-                    {sub}
-                    {sub && dates ? ' · ' : ''}
-                    {dates}
-                  </span>
-                )}
+                {details && <span className="block truncate text-xs text-ink-soft">{details}</span>}
               </span>
             </button>
             {g.whatsapp && g.id !== meId && (

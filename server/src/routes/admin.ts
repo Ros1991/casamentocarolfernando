@@ -6,7 +6,7 @@ import { requireAdmin } from '../auth.js';
 import { config } from '../config.js';
 import { db } from '../db/index.js';
 import { accommodations, guests, messages, photos } from '../db/schema.js';
-import { accommodationDTO, guestPublic } from '../dto.js';
+import { accommodationDTO, countPeople, guestPublic } from '../dto.js';
 import { formatPhone } from '../phone.js';
 import { onlineGuestIds } from '../realtime.js';
 import { WEDDING } from '../wedding.js';
@@ -51,12 +51,13 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
   app.addHook('preHandler', requireAdmin);
 
   app.get('/api/admin/stats', async () => {
-    const guestCount = db.select({ n: count() }).from(guests).get()?.n ?? 0;
+    const guestRows = db.select({ companions: guests.companions }).from(guests).all();
     const photoCount = db.select({ n: count() }).from(photos).where(isNull(photos.deletedAt)).get()?.n ?? 0;
     const messageCount = db.select({ n: count() }).from(messages).where(isNull(messages.deletedAt)).get()?.n ?? 0;
     const withDates = db.select({ n: count() }).from(guests).where(isNull(guests.arrivalDate)).get()?.n ?? 0;
     return {
-      guests: guestCount,
+      guests: guestRows.length,
+      people: countPeople(guestRows),
       photos: photoCount,
       messages: messageCount,
       online: onlineGuestIds().length,
@@ -90,15 +91,30 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       .orderBy(guests.name)
       .all();
 
-    const header = ['Nome', 'WhatsApp', 'Hospedagem', 'Cidade', 'Chegada', 'Saída', 'Mostra WhatsApp', 'Cadastro', 'Último acesso'];
+    const header = [
+      'Nome',
+      'WhatsApp',
+      'Acompanhantes',
+      'Pessoas',
+      'Hospedagem',
+      'Cidade',
+      'Chegada',
+      'Saída',
+      'Mostra WhatsApp',
+      'Cadastro',
+      'Último acesso',
+    ];
     const lines = [header.join(';')];
     for (const { guest: g, accommodation: a } of rows) {
       const place = a ? a.name : g.customPlaceLabel ?? 'Ainda não sabe';
       const city = a ? a.city : g.customCity ?? '';
+      const companions = g.companions ?? [];
       lines.push(
         [
           g.name,
           formatPhone(g.phone),
+          companions.join(', '),
+          1 + companions.length,
           place,
           city,
           g.arrivalDate ?? '',

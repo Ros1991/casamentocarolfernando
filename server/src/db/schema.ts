@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { index, integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 /** Hotéis/pousadas pré-cadastrados (do site oficial) + pontos de referência (Espaço Tuá). */
@@ -31,6 +32,11 @@ export const guests = sqliteTable('guests', {
   departureDate: text('departure_date'),
   showPhone: integer('show_phone', { mode: 'boolean' }).notNull().default(false),
   avatarKey: text('avatar_key'),
+  /** Nomes de quem vem junto (casal, família): contam nos números sem precisar entrar no site */
+  companions: text('companions', { mode: 'json' })
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'`),
   createdAt: integer('created_at').notNull(),
   lastSeenAt: integer('last_seen_at').notNull(),
 });
