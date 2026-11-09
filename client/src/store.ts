@@ -3,7 +3,19 @@ import { api, ApiError } from './lib/api';
 import { firstName } from './lib/format';
 import { showLocalNotification, unsubscribePush } from './lib/push';
 import { disconnectSocket, getSocket } from './lib/socket';
-import type { AppConfig, EnterPayload, GuestMe, GuestPublic, Message, Photo, Reaction, StayInput } from './lib/types';
+import type {
+  AppConfig,
+  EnterPayload,
+  EventItem,
+  EventPayload,
+  GuestMe,
+  GuestPublic,
+  Message,
+  Photo,
+  Reaction,
+  RsvpStatus,
+  StayInput,
+} from './lib/types';
 
 type AuthStatus = 'loading' | 'anon' | 'authed';
 
@@ -38,6 +50,9 @@ interface State {
   photos: Photo[];
   photosLoaded: boolean;
 
+  events: EventItem[];
+  eventsLoaded: boolean;
+
   typing: Record<string, { name: string; until: number }>;
   unreadMural: number;
   muralActive: boolean;
@@ -60,6 +75,12 @@ interface State {
   toggleReaction: (messageId: number, emoji: string) => Promise<Reaction[]>;
   loadPhotos: () => Promise<void>;
   addMessageLocally: (message: Message) => void;
+
+  loadEvents: () => Promise<void>;
+  createEvent: (payload: EventPayload) => Promise<EventItem>;
+  updateEvent: (id: string, payload: Partial<EventPayload>) => Promise<EventItem>;
+  deleteEvent: (id: string) => Promise<void>;
+  setRsvp: (eventId: string, status: RsvpStatus | 'none', peopleCount?: number) => Promise<void>;
 
   setMuralActive: (active: boolean) => void;
   connectSocket: () => void;
@@ -95,6 +116,14 @@ function withGuest(p: Photo, m: Message): Photo {
   return { ...p, guest: p.guest ?? m.guest };
 }
 
+function sortEvents(list: EventItem[]): EventItem[] {
+  return [...list].sort((a, b) => a.date.localeCompare(b.date) || (a.time ?? '99:99').localeCompare(b.time ?? '99:99'));
+}
+
+function upsertEvent(list: EventItem[], e: EventItem): EventItem[] {
+  return sortEvents([...list.filter((x) => x.id !== e.id), e]);
+}
+
 export const useStore = create<State>((set, get) => ({
   config: null,
   authStatus: 'loading',
@@ -112,6 +141,9 @@ export const useStore = create<State>((set, get) => ({
 
   photos: [],
   photosLoaded: false,
+
+  events: [],
+  eventsLoaded: false,
 
   typing: {},
   unreadMural: 0,
@@ -292,6 +324,36 @@ export const useStore = create<State>((set, get) => ({
     }));
   },
 
+  async loadEvents() {
+    const res = await api<{ events: EventItem[] }>('/api/events');
+    set({ events: sortEvents(res.events), eventsLoaded: true });
+  },
+
+  async createEvent(payload) {
+    const res = await api<{ event: EventItem }>('/api/events', { method: 'POST', json: payload });
+    set((s) => ({ events: upsertEvent(s.events, res.event) }));
+    return res.event;
+  },
+
+  async updateEvent(id, payload) {
+    const res = await api<{ event: EventItem }>(`/api/events/${id}`, { method: 'PATCH', json: payload });
+    set((s) => ({ events: upsertEvent(s.events, res.event) }));
+    return res.event;
+  },
+
+  async deleteEvent(id) {
+    await api(`/api/events/${id}`, { method: 'DELETE' });
+    set((s) => ({ events: s.events.filter((e) => e.id !== id) }));
+  },
+
+  async setRsvp(eventId, status, peopleCount) {
+    const res = await api<{ event: EventItem }>(`/api/events/${eventId}/rsvp`, {
+      method: 'PUT',
+      json: { status, peopleCount },
+    });
+    set((s) => ({ events: upsertEvent(s.events, res.event) }));
+  },
+
   setMuralActive(active) {
     set({ muralActive: active, unreadMural: active ? 0 : get().unreadMural });
   },
@@ -334,6 +396,13 @@ export const useStore = create<State>((set, get) => ({
         set((s) => ({ messages: s.messages.map((m) => (m.id === messageId ? { ...m, reactions } : m)) }));
       });
 
+      socket.on('event:upsert', (e: EventItem) => {
+        set((s) => ({ events: upsertEvent(s.events, e) }));
+      });
+      socket.on('event:deleted', ({ id }: { id: string }) => {
+        set((s) => ({ events: s.events.filter((e) => e.id !== id) }));
+      });
+
       socket.on('guest:upsert', (g: GuestPublic) => {
         set((s) => {
           const me = s.me && s.me.id === g.id ? { ...s.me, ...g, phone: s.me.phone, showPhone: s.me.showPhone } : s.me;
@@ -372,6 +441,7 @@ export const useStore = create<State>((set, get) => ({
     if (s.messagesLoaded) jobs.push(s.loadMessages());
     if (s.photosLoaded) jobs.push(s.loadPhotos());
     if (s.guestsLoaded) jobs.push(s.loadGuests());
+    if (s.eventsLoaded) jobs.push(s.loadEvents());
     await Promise.allSettled(jobs);
   },
 }));

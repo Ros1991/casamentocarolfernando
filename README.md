@@ -44,6 +44,16 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 | `MAP_TILE_URL` / `MAP_TILE_ATTRIBUTION` | não | Troca o provedor de tiles do mapa (padrão OpenStreetMap) |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | para avisos | Chaves do Web Push (avisos de novas mensagens). Sem elas, os avisos ficam desligados |
 
+## Combinados (Agenda)
+
+- Admins criam **combinados dos noivos** (ex.: Jangaday em 21/12): ficam em destaque na Agenda, no Início, no mapa (se tiverem ponto) e no telão, entram como mensagem no mural e disparam aviso no celular de todos que ativaram notificações.
+- Qualquer convidado pode **propor um combinado da galera** (mesmo fluxo, sem o aviso geral).
+- Cada convidado responde **Vou / Talvez / Não vou** e, se tiver acompanhantes, diz quantos da sua turma vão. A lista de quem vai fica em "Ver quem vai"; no `/admin` há a contagem e um CSV por combinado.
+
+## Domínio
+
+Além do domínio do Railway, está registrado `app.annacarolinaefernando.com` (CNAME `app` → `vdx2u7zy.up.railway.app`, criado no DNS do domínio dos noivos). Quando o DNS propagar, trocar `PUBLIC_URL` e `VAPID_SUBJECT` para `https://app.annacarolinaefernando.com`.
+
 ## App instalável e avisos
 
 - O site é um PWA: no Android/Chrome aparece um convite "Instalar o app" no Início (diálogo nativo); no iPhone o Safari não oferece esse botão, então o Início mostra o passo a passo (Compartilhar → Adicionar à Tela de Início). Instalado, abre em tela cheia pelo ícone.
@@ -90,7 +100,7 @@ railway config apply        # aplica (pede confirmação)
 | `/mural` | Chat em grupo em tempo real, com fotos |
 | `/mapa` | Hospedagens com quem fica em cada uma + fotos geolocalizadas |
 | `/fotos` | Galeria |
-| `/chegadas` | Quem chega e vai embora em cada dia |
+| `/agenda` | Combinados (dos noivos e da galera) com confirmação de presença; aba "Quem chega quando" |
 | `/perfil` | Editar dados, foto de perfil, sair |
 | `/telao` | Slideshow em tela cheia para a festa (código do telão ou login) |
 | `/admin` | Estatísticas, lista de convidados, CSV e ZIP (só `ADMIN_PHONES`) |

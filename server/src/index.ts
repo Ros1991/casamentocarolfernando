@@ -14,6 +14,7 @@ import { setupPush } from './push.js';
 import { setupRealtime } from './realtime.js';
 import adminRoutes from './routes/admin.js';
 import authRoutes from './routes/auth.js';
+import eventRoutes from './routes/events.js';
 import guestRoutes from './routes/guests.js';
 import messageRoutes from './routes/messages.js';
 import photoRoutes from './routes/photos.js';
@@ -87,6 +88,7 @@ async function main(): Promise<void> {
   await app.register(messageRoutes);
   await app.register(photoRoutes);
   await app.register(telaoRoutes);
+  await app.register(eventRoutes);
   await app.register(pushRoutes);
   await app.register(adminRoutes);
   setupPush(app.log);
