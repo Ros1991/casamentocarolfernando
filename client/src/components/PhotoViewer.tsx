@@ -142,9 +142,9 @@ export function PhotoViewer({ photos, index, onClose, onIndexChange }: Props) {
             {canDelete &&
               (confirming ? (
                 <div className="flex items-center gap-1 text-sm">
-                  <span>Apagar?</span>
+                  <span>Apagar esta foto?</span>
                   <button type="button" onClick={handleDelete} className="rounded-full bg-rose px-3 py-1.5 font-semibold">
-                    Sim
+                    Sim, apagar
                   </button>
                   <button type="button" onClick={() => setConfirming(false)} className="rounded-full bg-white/15 px-3 py-1.5">
                     Não
@@ -154,10 +154,10 @@ export function PhotoViewer({ photos, index, onClose, onIndexChange }: Props) {
                 <button
                   type="button"
                   onClick={() => setConfirming(true)}
-                  className="rounded-full bg-white/15 p-2 hover:bg-rose"
-                  aria-label="Apagar foto"
+                  className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 text-sm font-semibold hover:bg-rose"
+                  title={isAdmin && me?.id !== photo.guestId ? 'Apagar como administrador' : 'Apagar minha foto'}
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={15} /> Apagar
                 </button>
               ))}
           </div>

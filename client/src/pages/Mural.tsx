@@ -194,10 +194,11 @@ export function Mural() {
                         <button
                           type="button"
                           onClick={() => setConfirmDelete(m.id)}
-                          className="rounded-full p-1 text-ink-soft/60 hover:text-rose"
-                          aria-label="Apagar mensagem"
+                          className="rounded-full border border-sand bg-cream/80 p-1.5 text-ink-soft hover:border-rose hover:text-rose"
+                          aria-label={m.photo ? 'Apagar foto' : 'Apagar mensagem'}
+                          title={mine ? 'Apagar' : 'Apagar como administrador'}
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={14} />
                         </button>
                       ))}
                   </div>
