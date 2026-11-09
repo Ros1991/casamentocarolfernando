@@ -74,7 +74,7 @@ export function PhotoViewer({ photos, index, onClose, onIndexChange }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-olive-dark/95 text-cream animate-fade-in" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[1200] flex flex-col bg-olive-dark/95 text-cream animate-fade-in" role="dialog" aria-modal="true">
       <div
         className="flex items-center gap-3 px-4 pb-2"
         style={{ paddingTop: 'calc(var(--safe-top) + 10px)' }}

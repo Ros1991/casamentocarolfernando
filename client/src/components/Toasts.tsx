@@ -12,7 +12,7 @@ export function Toasts() {
   if (toasts.length === 0) return null;
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 z-[70] flex flex-col items-center gap-2 px-4"
+      className="pointer-events-none fixed inset-x-0 z-[1300] flex flex-col items-center gap-2 px-4"
       style={{ top: 'calc(var(--safe-top) + 12px)' }}
     >
       {toasts.map((t) => (

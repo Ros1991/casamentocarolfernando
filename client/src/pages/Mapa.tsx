@@ -1,6 +1,6 @@
 import { Instagram, List, MessageCircle, Navigation, Users } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Marker } from 'react-leaflet';
+import { Marker, useMapEvents } from 'react-leaflet';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { BottomSheet } from '../components/BottomSheet';
@@ -50,6 +50,9 @@ export function Mapa() {
   const [listOpen, setListOpen] = useState(false);
   const [viewer, setViewer] = useState<number | null>(null);
   const [flyTarget, setFlyTarget] = useState<[number, number] | null>(null);
+  const [zoom, setZoom] = useState(10);
+  // Com o mapa afastado, os pinos mostram só o ícone e a contagem para não se sobreporem
+  const compact = zoom < 13;
 
   useEffect(() => {
     if (!guestsLoaded) void loadGuests().catch(() => undefined);
@@ -132,6 +135,7 @@ export function Mapa() {
       <BaseMap center={[w.mapCenter.lat, w.mapCenter.lng]} zoom={w.mapZoom} className="min-h-0 flex-1" zoomControl={false}>
         <FitBounds points={bounds} trigger={bounds.length} padding={48} maxZoom={13} />
         <FlyTo target={flyTarget} zoom={15} />
+        <ZoomWatcher onZoom={setZoom} />
 
         {showPeople &&
           accommodations.map((a) => {
@@ -141,7 +145,7 @@ export function Mapa() {
               <Marker
                 key={a.id}
                 position={[a.lat, a.lng]}
-                icon={placeIcon(a.type === 'evento' ? a.name : a.name.replace(/\s*\(.*\)$/, ''), count, kind)}
+                icon={placeIcon(a.type === 'evento' ? a.name : a.name.replace(/\s*\(.*\)$/, ''), count, kind, compact && kind !== 'venue')}
                 eventHandlers={{ click: () => setSheet({ kind: 'preset', accommodation: a }) }}
                 zIndexOffset={a.type === 'evento' ? 1000 : count * 10}
               />
@@ -153,7 +157,7 @@ export function Mapa() {
             <Marker
               key={g.id}
               position={[g.customLat!, g.customLng!]}
-              icon={placeIcon(firstName(g.name), 0, 'custom')}
+              icon={placeIcon(firstName(g.name), 0, 'custom', compact)}
               eventHandlers={{ click: () => setSheet({ kind: 'custom', guest: g }) }}
             />
           ))}
@@ -308,6 +312,16 @@ export function Mapa() {
       )}
     </div>
   );
+}
+
+function ZoomWatcher({ onZoom }: { onZoom: (zoom: number) => void }) {
+  const map = useMapEvents({
+    zoomend: () => onZoom(map.getZoom()),
+  });
+  useEffect(() => {
+    onZoom(map.getZoom());
+  }, [map, onZoom]);
+  return null;
 }
 
 function GuestRows({

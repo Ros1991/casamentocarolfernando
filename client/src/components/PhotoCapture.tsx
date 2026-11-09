@@ -189,9 +189,9 @@ export function PhotoCapture({ variant = 'fab', label = 'Tirar foto', className 
         {trigger}
         {menuOpen && (
           <>
-            <button type="button" className="fixed inset-0 z-30 cursor-default" aria-label="Fechar menu" onClick={() => setMenuOpen(false)} />
+            <button type="button" className="fixed inset-0 z-[1000] cursor-default" aria-label="Fechar menu" onClick={() => setMenuOpen(false)} />
             <div
-              className={`absolute z-40 min-w-48 overflow-hidden rounded-2xl border border-sand bg-cream shadow-soft animate-fade-in ${
+              className={`absolute z-[1010] min-w-48 overflow-hidden rounded-2xl border border-sand bg-cream shadow-soft animate-fade-in ${
                 variant === 'fab' ? 'right-0 bottom-full mb-2' : 'bottom-full left-0 mb-2'
               }`}
             >
@@ -210,13 +210,13 @@ export function PhotoCapture({ variant = 'fab', label = 'Tirar foto', className 
       <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
 
       {preparing && (
-        <div className="fixed inset-0 z-[65] flex items-center justify-center bg-olive-dark/40">
+        <div className="fixed inset-0 z-[1250] flex items-center justify-center bg-olive-dark/40">
           <div className="rounded-2xl bg-cream px-5 py-4 font-semibold text-olive-dark shadow-soft">Preparando a foto…</div>
         </div>
       )}
 
       {draft && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-olive-dark/60 sm:items-center" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[1200] flex items-end justify-center bg-olive-dark/60 sm:items-center" role="dialog" aria-modal="true">
           <div
             className="flex max-h-[95dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-cream shadow-soft sm:rounded-3xl animate-fade-in"
             style={{ paddingBottom: 'var(--safe-bottom)' }}

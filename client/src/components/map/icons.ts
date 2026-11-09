@@ -10,13 +10,21 @@ const HOME = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke
 
 export type PlaceKind = 'venue' | 'preset' | 'custom';
 
-export function placeIcon(label: string, count: number, kind: PlaceKind): L.DivIcon {
+/**
+ * Pino de lugar (hotel, local da festa ou "outro lugar").
+ * `compact` esconde o rótulo (usado com o mapa afastado, para os pinos não se sobreporem).
+ */
+export function placeIcon(label: string, count: number, kind: PlaceKind, compact = false): L.DivIcon {
   const icon = kind === 'venue' ? RINGS : kind === 'custom' ? HOME : BED;
-  const cls = kind === 'venue' ? 'pin-place pin-venue' : kind === 'custom' ? 'pin-place pin-custom' : 'pin-place';
+  const classes = ['pin-place'];
+  if (kind === 'venue') classes.push('pin-venue');
+  if (kind === 'custom') classes.push('pin-custom');
+  if (compact) classes.push('pin-compact');
+  const labelHtml = compact ? '' : `<span>${escapeHtml(label)}</span>`;
   const countHtml = count > 0 ? `<span class="pin-count">${count}</span>` : '';
   return L.divIcon({
     className: '',
-    html: `<div class="${cls}">${icon}<span>${escapeHtml(label)}</span>${countHtml}</div>`,
+    html: `<div class="${classes.join(' ')}" title="${escapeHtml(label)}">${icon}${labelHtml}${countHtml}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   });

@@ -65,34 +65,54 @@ body {
 .leaflet-container {
   font-family: var(--font-sans);
   background: #e8ece3;
+  /* Mantém os z-index internos do Leaflet (até 1000) dentro do mapa,
+     para painéis e modais do app ficarem por cima */
+  isolation: isolate;
 }
 .leaflet-div-icon {
   background: transparent;
   border: none;
 }
+/* Sem anel de foco após toque/clique no pino (mantém para navegação por teclado) */
+.leaflet-marker-icon:focus:not(:focus-visible) {
+  outline: none;
+}
+/* O Leaflet dá largura 0 ao elemento do marcador: o pino precisa se dimensionar pelo conteúdo */
 .pin-place {
   position: relative;
-  display: flex;
+  display: inline-flex;
+  width: max-content;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px 4px 6px;
+  padding: 4px 9px 4px 7px;
   border-radius: 999px;
   background: var(--color-olive-dark);
   color: var(--color-cream);
   font-size: 12px;
   font-weight: 700;
+  line-height: 1.2;
   white-space: nowrap;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
-  transform: translate(-50%, -100%);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.3);
+  border: 2px solid var(--color-cream);
+  transform: translate(-50%, calc(-100% - 6px));
+}
+.pin-place.pin-compact {
+  padding: 5px 7px;
+  gap: 3px;
+}
+.pin-place svg {
+  flex: none;
 }
 .pin-place::after {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: -6px;
+  bottom: -7px;
   width: 10px;
   height: 10px;
   background: inherit;
+  border-right: 2px solid var(--color-cream);
+  border-bottom: 2px solid var(--color-cream);
   transform: translateX(-50%) rotate(45deg);
 }
 .pin-place.pin-venue {

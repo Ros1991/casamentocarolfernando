@@ -74,7 +74,7 @@ export function Reactions({ messageId, reactions, align = 'left', onLocalUpdate 
       </button>
       {open && (
         <div
-          className={`absolute bottom-full z-20 mb-1 flex gap-1 rounded-full border border-sand bg-cream px-2 py-1.5 shadow-soft animate-fade-in ${
+          className={`absolute bottom-full z-[1050] mb-1 flex gap-1 rounded-full border border-sand bg-cream px-2 py-1.5 shadow-soft animate-fade-in ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
