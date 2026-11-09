@@ -45,31 +45,31 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 
 ## Deploy no Railway
 
-### 1. Criar o serviço
+O projeto já está no ar: **projeto `galera-casamento`**, serviço **`galera`**, ligado ao repositório `Ros1991/casamentocarolfernando` (branch `main`). **Todo push na `main` faz deploy automaticamente.**
 
-1. No Railway, **New Project → Deploy from GitHub repo** e escolha `Ros1991/casamentocarolfernando`.
-2. O Railway detecta o `Dockerfile` e o `railway.json` (healthcheck em `/health`).
-3. Em **Variables**, cadastre as variáveis da tabela acima (pelo menos `SESSION_SECRET`, `INVITE_CODE`, `ADMIN_PHONES`, `TELAO_CODE`, `PUBLIC_URL`, `DATA_DIR=/data`).
-4. Em **Volumes**, crie um volume e monte em **`/data`**. Sem isso, banco e fotos somem a cada deploy.
-5. Em **Settings → Networking**, gere o domínio público (ou aponte um domínio próprio por CNAME). Coloque essa URL em `PUBLIC_URL`.
+- URL: <https://galera-production.up.railway.app>
+- Volume `galera-volume` montado em `/data` (banco `galera.db` + `uploads/`).
+- Variáveis cadastradas no serviço (ver tabela acima). Troque `INVITE_CODE`, `ADMIN_PHONES` e `TELAO_CODE` pelos valores definitivos no painel do Railway (Variables) ou com `railway variables --set "CHAVE=valor"`.
 
-Com o repositório conectado, **todo push na `main` já faz deploy**. Nada mais é necessário.
+### Infraestrutura como código (`.railway/railway.ts`)
 
-### 2. (Opcional) Deploy pelo GitHub Actions
+O `railway.json` foi aposentado pelo Railway (deixa de ser lido em 01/12/2026). A configuração do projeto vive em [`.railway/railway.ts`](.railway/railway.ts): serviço, fonte GitHub, volume, região, healthcheck e as variáveis (valores secretos ficam só no Railway, marcados com `preserve()`).
 
-O workflow em `.github/workflows/deploy.yml` roda o build em todo push e PR. Se quiser que o deploy saia dele em vez da integração nativa do Railway:
+```bash
+npm install                 # instala o SDK "railway" (devDependency)
+railway link                # uma vez por máquina: projeto galera-casamento, ambiente production
+railway config plan         # mostra o que mudaria no Railway
+railway config apply        # aplica (pede confirmação)
+```
 
-1. Railway: projeto → **Settings → Tokens → Create token** (token de projeto, ambiente `production`).
-2. GitHub: **Settings → Secrets and variables → Actions**:
-   - Secret `RAILWAY_TOKEN` = token criado;
-   - Variable `RAILWAY_SERVICE` = nome do serviço no Railway.
-3. Desconecte o repositório do serviço no Railway (para não fazer dois deploys por push).
+### Workflow do GitHub Actions
 
-Sem o secret, o job de deploy é pulado e o workflow serve só como verificação de build.
+`.github/workflows/deploy.yml` compila o projeto em todo push e PR (verificação). O deploy em si é feito pela integração GitHub do Railway. Se um dia quiser que o deploy saia do Actions, cadastre o secret `RAILWAY_TOKEN` e a variable `RAILWAY_SERVICE=galera` no GitHub e desconecte o repositório no Railway, para não ter dois deploys por push.
 
 ### Observações
 
 - Volume funciona com **uma réplica**; o redeploy tem alguns segundos de indisponibilidade.
+- O container roda como root porque o volume é montado como root (rodar como `node` dava `EACCES` em `/data`).
 - Backup: o admin baixa todas as fotos em `.zip` e a lista de convidados em `.csv` pela tela `/admin`. O banco é o arquivo `/data/galera.db`.
 - O `.env` local **não** vai para o git (está no `.gitignore`).
 

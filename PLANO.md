@@ -268,9 +268,11 @@ Seguir o site oficial para o convidado sentir que é "o mesmo casamento":
 
 **Fora desta rodada:** notificações push (Web Push exige VAPID + service worker e, no iPhone, o site instalado na tela inicial; o mural já mostra contador de não lidas). Pode entrar depois do beta se fizer sentido.
 
+**Deploy (09/11/2026):** código no GitHub (`Ros1991/casamentocarolfernando`) e projeto `galera-casamento` no Railway com serviço ligado ao repositório, volume em `/data`, variáveis e domínio <https://galera-production.up.railway.app>. Configuração em `.railway/railway.ts` (o `railway.json` foi aposentado pelo Railway). Códigos do convite/telão e telefones de admin estão **provisórios**.
+
 ## 14. Próximos passos
 
-1. Primeiro commit e push para `github.com/Ros1991/casamentocarolfernando`.
-2. Criar o serviço no Railway conectado ao repositório, com volume em `/data` e as variáveis do README.
-3. Testar num iPhone e num Android reais (câmera, GPS, instalação na tela inicial).
+1. Trocar no Railway os valores provisórios: `INVITE_CODE`, `TELAO_CODE` e `ADMIN_PHONES` (noivos + Rodrigo).
+2. Testar num iPhone e num Android reais (câmera, GPS, instalação na tela inicial).
+3. Decidir o endereço final (subdomínio do site oficial via CNAME ou manter o do Railway) e atualizar `PUBLIC_URL`.
 4. Beta com a família; pedir à designer os arquivos do monograma/aquarelas para substituir os placeholders.

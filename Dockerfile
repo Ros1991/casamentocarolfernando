@@ -34,8 +34,9 @@ COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/server/drizzle ./server/drizzle
 COPY --from=build /app/client/dist ./client/dist
 
-RUN mkdir -p /data && chown -R node:node /data /app
-USER node
+# O volume do Railway é montado em /data como root; por isso o processo roda como root
+# (padrão em containers no Railway). Rodar como usuário "node" causa EACCES ao criar /data/uploads.
+RUN mkdir -p /data
 
 EXPOSE 3000
 CMD ["node", "server/dist/index.js"]
