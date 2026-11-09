@@ -1,0 +1,183 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+
+@theme {
+  --color-cream: #f3f1ea;
+  --color-cream-dark: #e9e6dc;
+  --color-sand: #ddd8c8;
+  --color-olive: #747948;
+  --color-olive-dark: #36441d;
+  --color-olive-light: #a4a87c;
+  --color-olive-pale: #e4e6d4;
+  --color-sky: #c9d8e3;
+  --color-sky-light: #e3ecf2;
+  --color-ink: #2f3324;
+  --color-ink-soft: #6b6f5c;
+  --color-rose: #b86b6b;
+
+  --font-sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-script: 'Allura', 'Brush Script MT', cursive;
+
+  --shadow-soft: 0 6px 24px -8px rgb(54 68 29 / 0.18);
+}
+
+:root {
+  color-scheme: light;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* Listras em aquarela, como no site oficial */
+.watercolor-stripes {
+  background-color: var(--color-cream);
+  background-image: repeating-linear-gradient(
+    180deg,
+    rgb(201 216 227 / 0.55) 0px,
+    rgb(201 216 227 / 0.55) 14px,
+    rgb(201 216 227 / 0.15) 18px,
+    transparent 22px,
+    transparent 40px
+  );
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Pinos do mapa */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #e8ece3;
+}
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+.pin-place {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 6px;
+  border-radius: 999px;
+  background: var(--color-olive-dark);
+  color: var(--color-cream);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
+  transform: translate(-50%, -100%);
+}
+.pin-place::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+.pin-place.pin-venue {
+  background: var(--color-rose);
+}
+.pin-place.pin-custom {
+  background: var(--color-olive);
+}
+.pin-place .pin-count {
+  display: inline-flex;
+  min-width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-cream);
+  color: var(--color-olive-dark);
+  font-size: 11px;
+}
+.pin-photo {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 3px solid var(--color-cream);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.3);
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  background: var(--color-sand);
+}
+.pin-pick {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-rose);
+  border: 3px solid var(--color-cream);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
+  transform: translate(-50%, -50%);
+}
+.cluster-photos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: var(--color-cream);
+  border: 3px solid var(--color-olive);
+  color: var(--color-olive-dark);
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
+  transform: translate(-50%, -50%);
+}
+
+/* Esconde barras de rolagem em faixas horizontais */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+.animate-kenburns {
+  animation: kenburns 12s ease-in-out both;
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#f3f1ea"/>
+  <rect x="40" y="40" width="432" height="432" rx="72" fill="none" stroke="#747948" stroke-width="6" opacity="0.55"/>
+  <!-- folha de antúrio -->
+  <g transform="translate(256 150)">
+    <path d="M0 -70 C 52 -62, 78 -18, 58 30 C 44 64, 14 78, 0 84 C -14 78, -44 64, -58 30 C -78 -18, -52 -62, 0 -70 Z" fill="#a4a87c" opacity="0.85"/>
+    <path d="M0 -58 L0 80" stroke="#747948" stroke-width="4" stroke-linecap="round"/>
+    <path d="M0 -20 C 18 -8, 30 8, 36 26 M0 10 C -18 20, -28 32, -34 46" stroke="#747948" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8"/>
+  </g>
+  <g font-family="Cormorant Garamond, Georgia, serif" font-weight="500" fill="#36441d" text-anchor="middle">
+    <text x="196" y="372" font-size="124">A</text>
+    <text x="256" y="366" font-size="92" fill="#747948" opacity="0.75">|</text>
+    <text x="318" y="372" font-size="124">F</text>
+  </g>
+</svg>
