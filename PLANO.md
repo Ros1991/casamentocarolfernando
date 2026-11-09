@@ -273,6 +273,7 @@ Seguir o site oficial para o convidado sentir que é "o mesmo casamento":
 ## 14. Próximos passos
 
 1. Trocar no Railway os valores provisórios: `INVITE_CODE`, `TELAO_CODE` e `ADMIN_PHONES` (noivos + Rodrigo).
+1. Antes de divulgar, zerar os dados de teste em produção (convidado "Teste Produção" e foto de teste): apagar `/data/galera.db*` e `/data/uploads/*` via `railway ssh` e reiniciar.
 2. Testar num iPhone e num Android reais (câmera, GPS, instalação na tela inicial).
 3. Decidir o endereço final (subdomínio do site oficial via CNAME ou manter o do Railway) e atualizar `PUBLIC_URL`.
 4. Beta com a família; pedir à designer os arquivos do monograma/aquarelas para substituir os placeholders.
