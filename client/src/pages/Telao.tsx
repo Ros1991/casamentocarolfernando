@@ -13,6 +13,7 @@ interface Feed {
   stats: { guests: number; photos: number };
   wedding: Wedding;
   publicUrl: string;
+  inviteCode: string | null;
 }
 
 const ROTATE_MS = 9000;
@@ -43,13 +44,14 @@ export function Telao() {
     void load();
   }, []);
 
-  // QR code com o endereço do site
+  // QR code com o endereço do site e o código do convite já embutido
   useEffect(() => {
-    const url = (feed?.publicUrl || window.location.origin) + '/entrar';
+    const base = (feed?.publicUrl || window.location.origin) + '/entrar';
+    const url = feed?.inviteCode ? `${base}?codigo=${encodeURIComponent(feed.inviteCode)}` : base;
     QRCode.toDataURL(url, { width: 320, margin: 1, color: { dark: '#36441d', light: '#f3f1ea' } })
       .then(setQr)
       .catch(() => setQr(null));
-  }, [feed?.publicUrl]);
+  }, [feed?.publicUrl, feed?.inviteCode]);
 
   // Tempo real: fotos novas entram na frente
   useEffect(() => {
@@ -196,6 +198,7 @@ export function Telao() {
         )}
         <p className="text-base leading-snug text-cream/80 text-balance">
           Aponte a câmera para o QR code, entre na galera e <strong className="text-cream">poste sua foto</strong>: ela aparece aqui na hora.
+          {feed.inviteCode && <span className="block text-sm text-cream/60">O código do convite já vai no QR code.</span>}
         </p>
         <div className="grid w-full grid-cols-2 gap-3">
           <div className="rounded-2xl bg-white/5 p-3">

@@ -15,6 +15,9 @@ export function RequireAuth() {
   }, [status, loadMe, loadConfig]);
 
   if (status === 'loading') return <Splash />;
-  if (status === 'anon') return <Navigate to="/entrar" replace state={{ from: location.pathname }} />;
+  if (status === 'anon') {
+    // Preserva a query (ex.: ?codigo=...) para a tela de entrada reconhecer o convite
+    return <Navigate to={{ pathname: '/entrar', search: location.search }} replace state={{ from: location.pathname }} />;
+  }
   return <Outlet />;
 }

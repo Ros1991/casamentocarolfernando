@@ -34,6 +34,8 @@ export default async function telaoRoutes(app: FastifyInstance): Promise<void> {
       stats: { guests: guestCount, photos: photoCount },
       wedding: WEDDING,
       publicUrl: config.publicUrl,
+      // Vai no QR code: quem escaneia entra sem digitar o código (o telão já é protegido)
+      inviteCode: config.inviteCode || null,
     };
   });
 }

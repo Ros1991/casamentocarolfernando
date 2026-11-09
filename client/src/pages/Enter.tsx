@@ -1,10 +1,10 @@
-import { CalendarDays, KeyRound, Phone, UserRound } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDays, Check, KeyRound, Phone, UserRound } from 'lucide-react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Monogram } from '../components/Monogram';
 import { Splash } from '../components/Splash';
 import { StayPicker } from '../components/StayPicker';
-import { errorMessage } from '../lib/api';
+import { ApiError, errorMessage } from '../lib/api';
 import { maskPhone } from '../lib/format';
 import { toast } from '../lib/toast';
 import type { StayInput } from '../lib/types';
@@ -22,9 +22,42 @@ const DEFAULT_STAY: StayInput = {
 const inputClass =
   'w-full rounded-2xl border border-sand bg-white/70 px-4 py-3 text-ink outline-none placeholder:text-ink-soft/60 focus:border-olive';
 
+const INVITE_STORAGE_KEY = 'galera:invite-code';
+const INVITE_PARAMS = ['codigo', 'convite', 'code', 'invite'];
+
+/** Código do convite vindo do link (?codigo=...) ou guardado de uma visita anterior. */
+function readInviteFromLink(params: URLSearchParams): string {
+  for (const key of INVITE_PARAMS) {
+    const value = params.get(key)?.trim();
+    if (value) {
+      try {
+        localStorage.setItem(INVITE_STORAGE_KEY, value);
+      } catch {
+        /* sem storage */
+      }
+      return value;
+    }
+  }
+  try {
+    return localStorage.getItem(INVITE_STORAGE_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function forgetStoredInvite(): void {
+  try {
+    localStorage.removeItem(INVITE_STORAGE_KEY);
+  } catch {
+    /* sem storage */
+  }
+}
+
 export function Enter() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [params] = useSearchParams();
+  const inviteFromLink = useMemo(() => readInviteFromLink(params), [params]);
   const config = useStore((s) => s.config);
   const loadConfig = useStore((s) => s.loadConfig);
   const authStatus = useStore((s) => s.authStatus);
@@ -36,7 +69,8 @@ export function Enter() {
   const [stay, setStay] = useState<StayInput>(DEFAULT_STAY);
   const [arrivalDate, setArrivalDate] = useState('');
   const [departureDate, setDepartureDate] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
+  const [inviteCode, setInviteCode] = useState(inviteFromLink);
+  const [showInviteField, setShowInviteField] = useState(!inviteFromLink);
   const [showPhone, setShowPhone] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +114,11 @@ export function Enter() {
       navigate(from && from !== '/entrar' ? from : '/', { replace: true });
     } catch (err) {
       setError(errorMessage(err));
+      if (err instanceof ApiError && err.code === 'inviteCode') {
+        // Código do link está errado ou mudou: mostra o campo para a pessoa corrigir
+        forgetStoredInvite();
+        setShowInviteField(true);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -179,7 +218,19 @@ export function Enter() {
           </div>
         </div>
 
-        {config.inviteRequired && (
+        {config.inviteRequired && !showInviteField && (
+          <div className="flex items-center gap-3 rounded-3xl border border-olive-light bg-olive-pale px-5 py-4 text-sm text-olive-dark">
+            <span className="rounded-full bg-olive p-1.5 text-cream">
+              <Check size={14} />
+            </span>
+            <span className="flex-1">Código do convite reconhecido pelo link.</span>
+            <button type="button" onClick={() => setShowInviteField(true)} className="font-semibold underline">
+              Alterar
+            </button>
+          </div>
+        )}
+
+        {config.inviteRequired && showInviteField && (
           <div className="space-y-3 rounded-3xl border border-sand bg-cream p-5 shadow-soft">
             <label className="block">
               <span className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-olive-dark">
