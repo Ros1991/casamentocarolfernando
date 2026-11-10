@@ -1,6 +1,6 @@
 # Galera do Casamento — Anna Carolina & Fernando
 
-Rede social do casamento (19/12/2026, Espaço Tuá, Maceió/AL): quem fica onde, mural em tempo real, fotos tiradas na hora marcadas no mapa, "quem chega quando" e telão para a festa.
+Rede social do casamento (19/12/2026, Espaço Tuá, Maceió/AL): quem fica onde, mural em tempo real, fotos tiradas na hora marcadas no mapae "quem chega quando".
 
 O plano completo e as decisões estão em [PLANO.md](PLANO.md).
 
@@ -14,7 +14,7 @@ O plano completo e as decisões estão em [PLANO.md](PLANO.md).
 
 ```bash
 npm install
-cp .env.example .env   # ajuste INVITE_CODE, ADMIN_PHONES, TELAO_CODE
+cp .env.example .env   # ajuste ADMIN_PHONES
 npm run dev            # server em :3000 e client (Vite) em :5173
 ```
 
@@ -38,15 +38,20 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 | `SESSION_SECRET` | **sim em produção** | Frase longa e aleatória que assina os cookies |
 | `INVITE_CODE` | não | Código que os convidados digitam na entrada. **Está vazio (sem código)** por decisão dos noivos; defina uma palavra para passar a exigir |
 | `ADMIN_PHONES` | recomendado | Telefones (só dígitos, com 55) com acesso ao `/admin`, separados por vírgula |
-| `TELAO_CODE` | recomendado | Código para abrir `/telao` sem login |
 | `MAX_UPLOAD_MB` | não | Limite por foto (padrão 12) |
-| `PUBLIC_URL` | recomendado | URL pública (usada no QR code do telão) |
+| `PUBLIC_URL` | recomendado | URL pública (usada nos avisos e links) |
 | `MAP_TILE_URL` / `MAP_TILE_ATTRIBUTION` | não | Troca o provedor de tiles do mapa (padrão OpenStreetMap) |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | para avisos | Chaves do Web Push (avisos de novas mensagens). Sem elas, os avisos ficam desligados |
 
+## Mural
+
+- Mensagens e fotos em tempo real, com reações, **respostas com citação** e **menções com @** (quem é marcado ou respondido recebe aviso próprio), além de paleta de emojis.
+- No `/admin`, "Limpar mural" apaga as mensagens de texto (as fotos ficam).
+- O app aberto ou instalado **se atualiza sozinho** quando sai versão nova.
+
 ## Combinados (Agenda)
 
-- Admins criam **combinados dos noivos** (ex.: Jangaday em 21/12): ficam em destaque na Agenda, no Início, no mapa (se tiverem ponto) e no telão, entram como mensagem no mural e disparam aviso no celular de todos que ativaram notificações.
+- Admins criam **combinados dos noivos** (ex.: Jangaday em 21/12): ficam em destaque na Agenda, no Início, no mapa (se tiverem ponto), entram como mensagem no mural e disparam aviso no celular de todos que ativaram notificações.
 - Qualquer convidado pode **propor um combinado da galera** (mesmo fluxo, sem o aviso geral).
 - Cada convidado responde **Vou / Talvez / Não vou** e, se tiver acompanhantes, diz quantos da sua turma vão. A lista de quem vai fica em "Ver quem vai"; no `/admin` há a contagem e um CSV por combinado.
 
@@ -67,7 +72,7 @@ O projeto já está no ar: **projeto `galera-casamento`**, serviço **`galera`**
 - URL oficial: <https://app.annacarolinaefernando.com> (o endereço <https://galera-production.up.railway.app> continua funcionando)
 - Região `us-east4` (Virgínia, a de menor latência para o Brasil entre as disponíveis).
 - Volume `galera-data` montado em `/data` (banco `galera.db` + `uploads/`).
-- Variáveis cadastradas no serviço (ver tabela acima). `ADMIN_PHONES` tem os noivos e o Rodrigo; `INVITE_CODE` está desligado; `TELAO_CODE` pode ser trocado no painel do Railway (Variables) ou com `railway variables --set "CHAVE=valor"`.
+- Variáveis cadastradas no serviço (ver tabela acima). `ADMIN_PHONES` tem os noivos e o Rodrigo; `INVITE_CODE` está desligado.
 
 ### Infraestrutura como código (`.railway/railway.ts`)
 
@@ -102,7 +107,6 @@ railway config apply        # aplica (pede confirmação)
 | `/fotos` | Galeria |
 | `/agenda` | Combinados (dos noivos e da galera) com confirmação de presença; aba "Quem chega quando" |
 | `/perfil` | Editar dados, foto de perfil, sair |
-| `/telao` | Slideshow em tela cheia para a festa (código do telão ou login) |
 | `/admin` | Estatísticas, lista de convidados, CSV e ZIP (só `ADMIN_PHONES`) |
 
 ## Estrutura
@@ -114,7 +118,7 @@ client/           React + Vite
   src/lib/        api, socket, geo (GPS/EXIF), image (compressão), offlineQueue, format
   src/store.ts    estado global (Zustand) + eventos do Socket.IO
 server/           Fastify + Socket.IO
-  src/routes/     auth, guests, messages, photos, telao, admin
+  src/routes/     auth, guests, messages, photos, events, push, admin
   src/db/         schema Drizzle + conexão SQLite
   drizzle/        migrações SQL geradas
 scripts/          make-icons.mjs

@@ -267,6 +267,7 @@ Seguir o site oficial para o convidado sentir que é "o mesmo casamento":
 - Extras (09/11): código do convite pela URL (`?codigo=`) e no QR do telão; **acompanhantes** (casal/família) cadastrados pelo convidado, contando nos números do mapa, das chegadas e do admin.
 - Infra: Dockerfile, railway.json, workflow do GitHub Actions (build + deploy opcional via token), PWA (manifest e ícones).
 
+- **Trazido do site da Babi & Pedro (10/11):** mural com respostas e menções @, paleta de emojis, foto de perfil com enquadramento, app que se atualiza sozinho, agenda com botão único de resposta, card de presentes, limpeza do mural no admin. **Telão removido** a pedido do Rodrigo.
 - **Agenda / Combinados** (09/11): combinados dos noivos (oficiais) e da galera, com Vou/Talvez/Não vou, contagem por pessoas (acompanhantes incluídos), destaque no Início, pino no mapa, telão, mensagem automática no mural, aviso push geral para os oficiais e CSV de confirmados no admin. "Quem chega quando" virou aba da Agenda.
 - Extras (09/11, tarde): botão "Apagar" evidente e moderação de fotos no admin; **app instalável** (service worker + convite de instalação; passo a passo no iPhone) e **avisos de novas mensagens** via Web Push (no iPhone só com o app instalado, regra da Apple), com aviso local quando o app está em segundo plano.
 

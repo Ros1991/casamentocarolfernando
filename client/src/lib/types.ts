@@ -11,6 +11,7 @@ export interface Wedding {
   officialSite: string;
   rsvpUrl: string;
   giftsUrl: string;
+  pixKey: string;
   dressCode: string;
   dressCodeDetails: string;
   verse: string;
@@ -34,7 +35,6 @@ export interface Accommodation {
 
 export interface AppConfig {
   inviteRequired: boolean;
-  telaoEnabled: boolean;
   wedding: Wedding;
   map: { tileUrl: string; attribution: string };
   push: { enabled: boolean; publicKey: string | null };
@@ -100,8 +100,21 @@ export interface Message {
   photo: Photo | null;
   createdAt: number;
   reactions: Reaction[];
+  /** Mensagem respondida (como no WhatsApp) */
+  replyTo?: ReplyPreview | null;
+  /** Ids dos convidados marcados com @ */
+  mentions?: string[];
   /** Só no cliente: envio em andamento */
   pending?: boolean;
+}
+
+export interface ReplyPreview {
+  id: number;
+  guestId: string;
+  guestName: string;
+  text: string | null;
+  thumbUrl: string | null;
+  deleted: boolean;
 }
 
 export type StayMode = 'preset' | 'custom' | 'unknown';

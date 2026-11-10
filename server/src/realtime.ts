@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { Server } from 'socket.io';
-import { guestFromCookieHeader, telaoFromCookieHeader } from './auth.js';
+import { guestFromCookieHeader } from './auth.js';
 
 interface GuestLite {
   id: string;
@@ -24,8 +24,7 @@ export function setupRealtime(app: FastifyInstance): void {
   io.use((socket, next) => {
     const header = socket.handshake.headers.cookie;
     const guest = guestFromCookieHeader(app, header);
-    const telao = !guest && telaoFromCookieHeader(app, header);
-    if (!guest && !telao) return next(new Error('unauthorized'));
+    if (!guest) return next(new Error('unauthorized'));
     socket.data.guest = guest ? ({ id: guest.id, name: guest.name } satisfies GuestLite) : null;
     next();
   });
@@ -67,7 +66,7 @@ function broadcastPresence(): void {
   io?.to(ROOM).emit('presence', presencePayload());
 }
 
-/** Envia um evento para todos os conectados (convidados e telão). */
+/** Envia um evento para todos os conectados (convidados). */
 export function broadcast(event: string, payload: unknown): void {
   io?.to(ROOM).emit(event, payload);
 }

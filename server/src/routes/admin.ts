@@ -1,6 +1,6 @@
 import path from 'node:path';
 import archiver from 'archiver';
-import { count, desc, eq, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, isNull } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { requireAdmin } from '../auth.js';
 import { config } from '../config.js';
@@ -8,7 +8,7 @@ import { db } from '../db/index.js';
 import { accommodations, guests, messages, photos } from '../db/schema.js';
 import { accommodationDTO, countPeople, guestPublic } from '../dto.js';
 import { formatPhone } from '../phone.js';
-import { onlineGuestIds } from '../realtime.js';
+import { broadcast, onlineGuestIds } from '../realtime.js';
 import { WEDDING } from '../wedding.js';
 
 const fmtDateTime = new Intl.DateTimeFormat('pt-BR', {
@@ -63,6 +63,19 @@ export default async function adminRoutes(app: FastifyInstance): Promise<void> {
       online: onlineGuestIds().length,
       guestsWithoutArrival: withDates,
     };
+  });
+
+  /** Limpa o mural: apaga (de forma reversível) as mensagens de texto. As fotos ficam. */
+  app.post('/api/admin/mural/limpar', async () => {
+    const rows = db
+      .select({ id: messages.id })
+      .from(messages)
+      .where(and(isNull(messages.deletedAt), isNull(messages.photoId)))
+      .all();
+    const now = Date.now();
+    db.update(messages).set({ deletedAt: now }).where(and(isNull(messages.deletedAt), isNull(messages.photoId))).run();
+    for (const r of rows) broadcast('message:deleted', { id: r.id, photoId: null });
+    return { ok: true, removed: rows.length };
   });
 
   app.get('/api/admin/guests', async () => {

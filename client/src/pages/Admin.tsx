@@ -42,6 +42,18 @@ export function Admin() {
   const [loading, setLoading] = useState(false);
   const [confirmPhoto, setConfirmPhoto] = useState<string | null>(null);
   const [viewer, setViewer] = useState<number | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
+
+  const clearMural = async () => {
+    setConfirmClear(false);
+    try {
+      const res = await api<{ removed: number }>('/api/admin/mural/limpar', { method: 'POST' });
+      toast.success(res.removed === 1 ? '1 mensagem apagada.' : res.removed + ' mensagens apagadas.');
+      void load();
+    } catch (err) {
+      toast.error(errorMessage(err));
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -201,6 +213,24 @@ export function Admin() {
         Mensagens impróprias no mural também podem ser apagadas por você: use a lixeira ao lado de cada mensagem. Como admin,
         você pode apagar qualquer conteúdo; cada convidado só apaga o que postou.
       </p>
+
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-dashed border-sand px-4 py-3 text-sm">
+        <span className="flex-1 text-ink-soft">Limpar o mural: apaga todas as mensagens de texto (as fotos ficam). Útil para zerar os testes.</span>
+        {confirmClear ? (
+          <span className="flex gap-1">
+            <button type="button" onClick={clearMural} className="rounded-full bg-rose px-3 py-1.5 font-semibold text-cream">
+              Sim, limpar
+            </button>
+            <button type="button" onClick={() => setConfirmClear(false)} className="rounded-full border border-sand px-3 py-1.5">
+              Não
+            </button>
+          </span>
+        ) : (
+          <button type="button" onClick={() => setConfirmClear(true)} className="flex items-center gap-1 rounded-full border border-rose/50 px-3 py-1.5 font-semibold text-rose">
+            <Trash2 size={14} /> Limpar mural
+          </button>
+        )}
+      </div>
 
       <section className="overflow-hidden rounded-3xl border border-sand bg-white/60">
         <div className="border-b border-sand px-4 py-3 font-serif text-lg font-semibold text-olive-dark">

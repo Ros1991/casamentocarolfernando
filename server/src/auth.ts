@@ -6,9 +6,7 @@ import { db } from './db/index.js';
 import { guests, sessions, type Guest } from './db/schema.js';
 
 export const SESSION_COOKIE = 'galera_session';
-export const TELAO_COOKIE = 'galera_telao';
 const SESSION_MS = 120 * 24 * 60 * 60 * 1000; // 120 dias
-const TELAO_MS = 60 * 24 * 60 * 60 * 1000; // 60 dias
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -63,15 +61,6 @@ export function guestFromCookieHeader(app: FastifyInstance, header: string | und
   return resolveGuestByToken(unsigned.value);
 }
 
-export function telaoFromCookieHeader(app: FastifyInstance, header: string | undefined): boolean {
-  if (!header) return false;
-  const cookies = app.parseCookie(header);
-  const raw = cookies[TELAO_COOKIE];
-  if (!raw) return false;
-  const unsigned = app.unsignCookie(raw);
-  return unsigned.valid && unsigned.value === 'ok';
-}
-
 function isSecure(request: FastifyRequest): boolean {
   return request.protocol === 'https';
 }
@@ -89,26 +78,6 @@ export function setSessionCookie(request: FastifyRequest, reply: FastifyReply, t
 
 export function clearSessionCookie(reply: FastifyReply): void {
   reply.clearCookie(SESSION_COOKIE, { path: '/' });
-}
-
-export function setTelaoCookie(request: FastifyRequest, reply: FastifyReply): void {
-  reply.setCookie(TELAO_COOKIE, 'ok', {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: isSecure(request),
-    maxAge: Math.floor(TELAO_MS / 1000),
-    signed: true,
-  });
-}
-
-/** Telão: cookie do telão OU qualquer convidado logado. */
-export function hasTelaoAccess(request: FastifyRequest): boolean {
-  if (request.guest) return true;
-  const raw = request.cookies[TELAO_COOKIE];
-  if (!raw) return false;
-  const unsigned = request.unsignCookie(raw);
-  return unsigned.valid && unsigned.value === 'ok';
 }
 
 export async function requireGuest(request: FastifyRequest, reply: FastifyReply): Promise<void> {

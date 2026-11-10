@@ -152,7 +152,7 @@ export function EventForm({ open, onClose, editing }: Props) {
             <input type="checkbox" checked={isOfficial} onChange={(e) => setIsOfficial(e.target.checked)} className="mt-0.5 accent-olive" />
             <span>
               <strong>Combinado dos noivos</strong>
-              <span className="block text-xs">Fica em destaque, aparece no Início e no telão e avisa todo mundo no celular.</span>
+              <span className="block text-xs">Fica em destaque, aparece no Início e avisa todo mundo no celular.</span>
             </span>
           </label>
         )}

@@ -1,8 +1,6 @@
 import {
   CalendarDays,
-  Camera,
   ExternalLink,
-  Gift,
   Images,
   LocateFixed,
   MapPinned,
@@ -17,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { Avatar } from '../components/Avatar';
 import { Countdown } from '../components/Countdown';
 import { EventCard } from '../components/EventCard';
+import { GiftsCard } from '../components/GiftsCard';
 import { InstallBanner } from '../components/InstallBanner';
 import { Monogram } from '../components/Monogram';
 import { NotificationsCard } from '../components/NotificationsCard';
@@ -62,15 +61,18 @@ export function Home() {
 
   const guestList = useMemo(() => Object.values(guests), [guests]);
   const today = toDateOnly(new Date());
+  /** Combinados dos noivos que ainda estão por vir e que eu não respondi */
+  const pendingOfficial = useMemo(
+    () => events.filter((e) => e.date >= today && e.isOfficial && !e.rsvps.some((r) => r.guestId === me?.id)),
+    [events, today, me?.id],
+  );
+  // No Início: primeiro os que faltam responder; sem pendências, os dois próximos
   const featuredEvents = useMemo(() => {
+    if (pendingOfficial.length > 0) return pendingOfficial.slice(0, 2);
     const upcoming = events.filter((e) => e.date >= today);
     const official = upcoming.filter((e) => e.isOfficial);
     return (official.length > 0 ? official : upcoming).slice(0, 2);
-  }, [events, today]);
-  const pendingOfficial = useMemo(
-    () => featuredEvents.filter((e) => e.isOfficial && !e.rsvps.some((r) => r.guestId === me?.id)).length,
-    [featuredEvents, me?.id],
-  );
+  }, [events, today, pendingOfficial]);
   const tomorrow = addDays(today, 1);
   const arrivingSoon = useMemo(
     () => guestList.filter((g) => g.arrivalDate === today || g.arrivalDate === tomorrow),
@@ -162,9 +164,11 @@ export function Home() {
                 Ver agenda
               </Link>
             </div>
-            {pendingOfficial > 0 && (
+            {pendingOfficial.length > 0 && (
               <p className="rounded-2xl bg-rose/10 px-3 py-2 text-sm font-semibold text-rose">
-                Os noivos estão esperando sua resposta: confirme abaixo se você vai.
+                {pendingOfficial.length === 1
+                  ? `Falta responder 1 combinado dos noivos: ${pendingOfficial[0].title}.`
+                  : `Falta responder ${pendingOfficial.length} combinados dos noivos${pendingOfficial.length > 2 ? ' (os primeiros estão abaixo; o resto na Agenda)' : ''}.`}
               </p>
             )}
             {featuredEvents.map((e) => (
@@ -270,27 +274,20 @@ export function Home() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <GiftsCard />
+
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <a href={w.officialSite} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-2xl border border-sand bg-cream px-4 py-3 text-sm font-semibold text-olive-dark">
             Site oficial <ExternalLink size={16} />
           </a>
           <a href={w.rsvpUrl} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-2xl border border-sand bg-cream px-4 py-3 text-sm font-semibold text-olive-dark">
             Confirmar presença <ExternalLink size={16} />
           </a>
-          <a href={w.giftsUrl} target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-2xl border border-sand bg-cream px-4 py-3 text-sm font-semibold text-olive-dark">
-            <span className="flex items-center gap-1.5">
-              <Gift size={16} /> Lista de presentes
-            </span>
-            <ExternalLink size={16} />
-          </a>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <Link to="/fotos" className="flex items-center gap-1.5 rounded-full border border-sand px-3 py-1.5 text-xs font-semibold text-olive-dark">
             <Images size={14} /> Galeria
-          </Link>
-          <Link to="/telao" className="flex items-center gap-1.5 rounded-full border border-sand px-3 py-1.5 text-xs font-semibold text-olive-dark">
-            <Camera size={14} /> Telão da festa
           </Link>
           {isAdmin && (
             <Link to="/admin" className="flex items-center gap-1.5 rounded-full border border-olive bg-olive-pale px-3 py-1.5 text-xs font-semibold text-olive-dark">

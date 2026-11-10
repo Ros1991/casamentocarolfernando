@@ -31,7 +31,6 @@ export default defineRailway(() => {
       SESSION_SECRET: preserve(),
       // INVITE_CODE desligado a pedido dos noivos (sem código na entrada); para exigir, declare aqui e no Railway
       ADMIN_PHONES: preserve(),
-      TELAO_CODE: preserve(),
       VAPID_PUBLIC_KEY: preserve(),
       VAPID_PRIVATE_KEY: preserve(),
     },

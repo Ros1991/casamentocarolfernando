@@ -6,7 +6,7 @@ import rateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
 import { eq } from 'drizzle-orm';
 import Fastify from 'fastify';
-import { hasTelaoAccess, resolveGuestByToken, sessionTokenFromRequest } from './auth.js';
+import { resolveGuestByToken, sessionTokenFromRequest } from './auth.js';
 import { config } from './config.js';
 import { closeDb, db, runMigrations } from './db/index.js';
 import { guests } from './db/schema.js';
@@ -19,7 +19,6 @@ import guestRoutes from './routes/guests.js';
 import messageRoutes from './routes/messages.js';
 import photoRoutes from './routes/photos.js';
 import pushRoutes from './routes/push.js';
-import telaoRoutes from './routes/telao.js';
 import { seedAccommodations } from './seed.js';
 
 const LAST_SEEN_INTERVAL = 2 * 60 * 1000;
@@ -87,16 +86,15 @@ async function main(): Promise<void> {
   await app.register(guestRoutes);
   await app.register(messageRoutes);
   await app.register(photoRoutes);
-  await app.register(telaoRoutes);
   await app.register(eventRoutes);
   await app.register(pushRoutes);
   await app.register(adminRoutes);
   setupPush(app.log);
 
-  // Fotos: só para convidados logados ou telão.
+  // Fotos: só para convidados logados.
   await app.register(async (scope) => {
     scope.addHook('onRequest', async (request, reply) => {
-      if (!request.guest && !hasTelaoAccess(request)) {
+      if (!request.guest) {
         return reply.code(401).send({ error: 'unauthorized' });
       }
     });
