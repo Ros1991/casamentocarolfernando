@@ -42,6 +42,7 @@ export function GiftsCard() {
             <span className="min-w-0">
               <span className="block text-[11px] font-bold tracking-widest text-olive uppercase">Chave Pix</span>
               <span className="block truncate font-semibold text-ink">{wedding.pixKey}</span>
+              {wedding.pixHolder && <span className="block truncate text-xs text-ink-soft">{wedding.pixHolder}</span>}
             </span>
             <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-olive-dark">
               <Copy size={15} /> Copiar

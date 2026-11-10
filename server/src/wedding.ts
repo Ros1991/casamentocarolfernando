@@ -14,8 +14,6 @@ export const WEDDING = {
   rsvpUrl:
     'https://wa.me/5549999442022?text=Ol%C3%A1,+gostaria+de+confirmar+minha+presen%C3%A7a+no+casamento+da+Anna+Carolina+e+Fernando.',
   giftsUrl: 'https://sites.icasei.com.br/annacarolinaefernando/pages/37362022',
-  /** Chave Pix dos noivos (vazia = o card de presentes mostra só a lista) */
-  pixKey: '',
   dressCode: 'Passeio completo',
   dressCodeDetails:
     'Homens: camisa, blazer e calça social; gravata opcional. Mulheres: vestidos de tecidos fluidos. Evitar cores claras. Se optar por salto, prefira salto bloco.',

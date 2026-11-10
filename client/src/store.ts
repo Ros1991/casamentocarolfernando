@@ -186,6 +186,8 @@ export const useStore = create<State>((set, get) => ({
     const res = await api<MeResponse & { returning: boolean }>('/api/auth/enter', { method: 'POST', json: payload });
     set({ me: res.guest, isAdmin: res.isAdmin, authStatus: 'authed' });
     get().connectSocket();
+    // recarrega a configuração: a chave Pix só vem para quem já entrou
+    void api<AppConfig>('/api/config').then((config) => set({ config })).catch(() => undefined);
     return { returning: res.returning };
   },
 

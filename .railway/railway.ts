@@ -31,6 +31,9 @@ export default defineRailway(() => {
       SESSION_SECRET: preserve(),
       // INVITE_CODE desligado a pedido dos noivos (sem código na entrada); para exigir, declare aqui e no Railway
       ADMIN_PHONES: preserve(),
+      // Chave Pix dos noivos e titular (card de presentes); só no Railway, o repositório é público
+      PIX_KEY: preserve(),
+      PIX_HOLDER: preserve(),
       VAPID_PUBLIC_KEY: preserve(),
       VAPID_PRIVATE_KEY: preserve(),
     },

@@ -41,6 +41,7 @@ npm run icons          # regenera os ícones do PWA a partir de client/public/mo
 | `MAX_UPLOAD_MB` | não | Limite por foto (padrão 12) |
 | `PUBLIC_URL` | recomendado | URL pública (usada nos avisos e links) |
 | `MAP_TILE_URL` / `MAP_TILE_ATTRIBUTION` | não | Troca o provedor de tiles do mapa (padrão OpenStreetMap) |
+| `PIX_KEY` / `PIX_HOLDER` | não | Chave Pix dos noivos e o que aparece embaixo dela (ex.: `CPF · Nome`). Só vai para quem já entrou; vazia = card de presentes sem Pix |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | para avisos | Chaves do Web Push (avisos de novas mensagens). Sem elas, os avisos ficam desligados |
 
 ## Mural

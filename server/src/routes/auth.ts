@@ -8,6 +8,7 @@ import {
   isAdmin,
   sessionTokenFromRequest,
   setSessionCookie,
+  resolveGuestByToken,
 } from '../auth.js';
 import { config } from '../config.js';
 import { db } from '../db/index.js';
@@ -22,13 +23,18 @@ import { isInputError, parseCompanions, parseDates, parseStay } from './guestInp
 
 export default async function authRoutes(app: FastifyInstance): Promise<void> {
   /** Dados públicos: se exige código, infos do casamento e hospedagens (para a tela de entrada). */
-  app.get('/api/config', async () => ({
+  app.get('/api/config', async (request) => {
+    // A chave Pix só vai para quem já entrou (esta rota é aberta para a tela de entrada)
+    const token = sessionTokenFromRequest(request);
+    const logged = !!token && !!resolveGuestByToken(token);
+    return {
     inviteRequired: !!config.inviteCode,
-    wedding: WEDDING,
+    wedding: { ...WEDDING, pixKey: logged ? config.pixKey : '', pixHolder: logged ? config.pixHolder : '' },
     map: { tileUrl: config.mapTileUrl, attribution: config.mapTileAttribution },
     push: { enabled: pushEnabled, publicKey: pushEnabled ? config.vapidPublicKey : null },
     accommodations: db.select().from(accommodations).orderBy(accommodations.sortOrder).all().map(accommodationDTO),
-  }));
+    };
+  });
 
   app.post(
     '/api/auth/enter',

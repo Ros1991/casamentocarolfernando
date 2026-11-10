@@ -35,6 +35,9 @@ export const config = {
     .map((p) => normalizePhone(p))
     .filter((p): p is string => !!p),
   maxUploadBytes: Math.max(1, Number(process.env.MAX_UPLOAD_MB ?? 12)) * 1024 * 1024,
+  /** Chave Pix dos noivos e nome do titular: ficam só no ambiente (o repositório é público). Vazia = card sem Pix. */
+  pixKey: (process.env.PIX_KEY ?? '').trim(),
+  pixHolder: (process.env.PIX_HOLDER ?? '').trim(),
   publicUrl: (process.env.PUBLIC_URL ?? '').trim().replace(/\/$/, ''),
   /** Web Push (VAPID). Sem as duas chaves, os avisos ficam desligados. */
   vapidPublicKey: (process.env.VAPID_PUBLIC_KEY ?? '').trim(),

@@ -12,6 +12,7 @@ export interface Wedding {
   rsvpUrl: string;
   giftsUrl: string;
   pixKey: string;
+  pixHolder: string;
   dressCode: string;
   dressCodeDetails: string;
   verse: string;

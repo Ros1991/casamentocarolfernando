@@ -33,3 +33,17 @@ await sharp({ create: { width: 512, height: 512, channels: 4, background: '#f3f1
   .png()
   .toFile(path.join(outDir, 'icon-512-maskable.png'));
 console.log('ok icon-512-maskable.png');
+
+// Ícone pequeno das notificações no Android: o sistema usa só a silhueta (canal alfa) e pinta de branco.
+// Um ícone com fundo opaco vira um quadrado branco, então aqui sai só o "A | F" branco em fundo transparente.
+const badgeSvg = Buffer.from(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <g font-family="Georgia, serif" font-weight="700" fill="#fff" text-anchor="middle">
+    <text x="24" y="68" font-size="56">A</text>
+    <rect x="46.5" y="22" width="3" height="54" rx="1.5"/>
+    <text x="73" y="68" font-size="56">F</text>
+  </g>
+</svg>`,
+);
+await sharp(badgeSvg, { density: 288 }).resize(96, 96).png().toFile(path.join(outDir, 'badge.png'));
+console.log('ok badge.png');
