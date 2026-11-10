@@ -203,7 +203,7 @@ export function Home() {
             <MapPinned size={20} /> Mapa da galera
           </Link>
           <Link to="/agenda" className="flex items-center justify-center gap-2 rounded-2xl border border-olive bg-cream px-4 py-3 font-semibold text-olive-dark shadow-soft">
-            <CalendarDays size={20} /> Agenda e chegadas
+            <CalendarDays size={20} /> Agenda
           </Link>
         </div>
 

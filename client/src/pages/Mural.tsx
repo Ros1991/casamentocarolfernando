@@ -83,11 +83,12 @@ export function Mural() {
   const [flash, setFlash] = useState<number | null>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [sending, setSending] = useState(false);
-  const [nearBottom, setNearBottom] = useState(true);
   const [newBelow, setNewBelow] = useState(0);
   const [viewer, setViewer] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
-  const lastCount = useRef(0);
+  /** Última mensagem já tratada pela rolagem automática (id) e se a pessoa está perto do fim */
+  const lastSeenId = useRef<number | null>(null);
+  const nearBottomRef = useRef(true);
 
   useEffect(() => {
     if (!messagesLoaded) void loadMessages().catch((err) => toast.error(errorMessage(err)));
@@ -101,26 +102,31 @@ export function Mural() {
     setNewBelow(0);
   }, []);
 
-  // Rola para o fim ao carregar e quando chegam mensagens (se já estava perto do fim)
+  // Rola para o fim só em dois casos: ao abrir o mural e quando chega mensagem NOVA no fim da lista
+  // (se a pessoa já estava perto do fim, ou se a mensagem é dela). Rolar para cima, reações e
+  // mensagens antigas carregadas não puxam a tela de volta para baixo.
   useEffect(() => {
     if (!messagesLoaded) return;
-    const grew = messages.length > lastCount.current;
     const last = messages[messages.length - 1];
-    const mine = last && last.guestId === me?.id;
-    if (lastCount.current === 0 || nearBottom || mine) {
-      requestAnimationFrame(() => scrollToBottom(lastCount.current !== 0));
-    } else if (grew) {
-      setNewBelow((n) => n + (messages.length - lastCount.current));
+    const lastId = last?.id ?? null;
+    const first = lastSeenId.current === null;
+    const isNew = lastId !== null && lastId !== lastSeenId.current && (first || lastId > (lastSeenId.current ?? 0));
+    if (first) {
+      requestAnimationFrame(() => scrollToBottom(false));
+    } else if (isNew) {
+      if (nearBottomRef.current || last.guestId === me?.id) requestAnimationFrame(() => scrollToBottom(true));
+      else setNewBelow((n) => n + 1);
     }
-    lastCount.current = messages.length;
-  }, [messages, messagesLoaded, nearBottom, me?.id, scrollToBottom]);
+    if (lastId !== null) lastSeenId.current = lastId;
+    else if (first) lastSeenId.current = 0;
+  }, [messages, messagesLoaded, me?.id, scrollToBottom]);
 
   const onScroll = () => {
     const el = listRef.current;
     if (!el) return;
     const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
     const near = dist < 120;
-    setNearBottom(near);
+    nearBottomRef.current = near;
     if (near) setNewBelow(0);
   };
 
@@ -246,7 +252,7 @@ export function Mural() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div ref={listRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto px-3 pt-3 pb-2">
+      <div ref={listRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 pt-3 pb-2">
         {hasMore && (
           <div className="mb-3 text-center">
             <button
@@ -286,7 +292,7 @@ export function Mural() {
                 <div className="w-8 shrink-0">
                   {!grouped && !mine && <Avatar guest={m.guest} size={32} online={online.includes(m.guestId)} />}
                 </div>
-                <div className={`group relative max-w-[78%] ${mine ? 'items-end' : 'items-start'} flex flex-col`}>
+                <div className={`group relative max-w-[78%] min-w-0 ${mine ? 'items-end' : 'items-start'} flex flex-col`}>
                   {!grouped && !mine && <div className="mb-0.5 ml-1 text-xs font-semibold text-olive">{m.guest.name}</div>}
                   <MessageBubble
                     message={m}
@@ -297,7 +303,8 @@ export function Mural() {
                     onJump={jumpTo}
                     onOpenPhoto={openPhoto}
                     onImageLoad={() => {
-                      if (nearBottom) scrollToBottom();
+                      // foto terminou de carregar e empurrou a lista: acompanha só se a pessoa está no fim
+                      if (nearBottomRef.current) scrollToBottom();
                     }}
                   />
                   <div className={`mt-1 flex items-center gap-2 ${mine ? 'flex-row-reverse' : ''}`}>
@@ -382,9 +389,9 @@ export function Mural() {
           <div className="mx-1 mb-1.5 flex items-center gap-2 rounded-2xl border-l-4 border-olive bg-olive-pale px-3 py-2">
             <div className="min-w-0 flex-1">
               <div className="text-xs font-bold text-olive-dark">Respondendo a {replyingTo.guest.id === me?.id ? 'você' : replyingTo.guest.name}</div>
-              <div className="flex items-center gap-1 truncate text-sm text-ink-soft">
+              <div className="flex min-w-0 items-center gap-1 text-sm text-ink-soft">
                 {replyingTo.photo && <Camera size={13} className="shrink-0" />}
-                <span className="truncate">{replyingTo.text ?? (replyingTo.photo ? 'Foto' : '')}</span>
+                <span className="min-w-0 truncate">{replyingTo.text ?? (replyingTo.photo ? 'Foto' : '')}</span>
               </div>
             </div>
             <button type="button" onClick={() => setReplyingTo(null)} className="rounded-full p-1.5 text-ink-soft hover:bg-cream" aria-label="Cancelar resposta">
@@ -431,7 +438,7 @@ export function Mural() {
             }}
             onSelect={(e) => setCaret(e.currentTarget.selectionStart ?? 0)}
             onKeyDown={onKey}
-            placeholder="Mensagem para a galera… (@ marca alguém)"
+            placeholder="Mensagem para a galera…"
             rows={1}
             maxLength={2000}
             className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-sand bg-white/80 px-4 py-2.5 text-[15px] text-ink outline-none focus:border-olive"
@@ -483,7 +490,7 @@ function MessageBubble({
     // Com foto, o balão tem largura fixa e a foto ocupa tudo: a legenda quebra dentro dessa largura,
     // em vez de alargar o balão e deixar um vazio ao lado da foto.
     <div
-      className={`overflow-hidden rounded-2xl shadow-soft transition-shadow ${base} ${message.pending ? 'opacity-70' : ''} ${message.photo ? 'w-[300px] max-w-full' : ''} ${
+      className={`overflow-hidden rounded-2xl shadow-soft transition-shadow ${base} ${message.pending ? 'opacity-70' : ''} ${message.photo ? 'w-[300px]' : ''} max-w-full ${message.replyTo && !message.photo ? 'min-w-[190px]' : ''} ${
         highlight ? 'ring-4 ring-gold' : mentionsMe ? 'ring-2 ring-gold' : ''
       }`}
     >
@@ -502,7 +509,7 @@ function MessageBubble({
         </button>
       )}
       {message.text && (
-        <p className="px-3.5 py-2 text-[15px] leading-snug break-words whitespace-pre-wrap">{renderText(message.text, names, meId, mine)}</p>
+        <p className="px-3.5 py-2 text-[15px] leading-snug break-words whitespace-pre-wrap [overflow-wrap:anywhere]">{renderText(message.text, names, meId, mine)}</p>
       )}
     </div>
   );
@@ -514,7 +521,8 @@ function ReplyQuote({ reply, mine, meId, onJump }: { reply: ReplyPreview; mine: 
     <button
       type="button"
       onClick={() => onJump(reply.id)}
-      className={`m-1.5 mb-0 flex w-[calc(100%-0.75rem)] items-center gap-2 rounded-xl border-l-4 px-2.5 py-1.5 text-left ${
+      // w-0 + min-w: a citação acompanha a largura do balão em vez de alargá-lo; o texto corta com reticências
+      className={`m-1.5 mb-0 flex w-0 min-w-[calc(100%-0.75rem)] items-center gap-2 overflow-hidden rounded-xl border-l-4 px-2.5 py-1.5 text-left ${
         mine ? 'border-cream/70 bg-white/15' : 'border-olive bg-olive-pale'
       }`}
     >
@@ -522,9 +530,9 @@ function ReplyQuote({ reply, mine, meId, onJump }: { reply: ReplyPreview; mine: 
         <span className={`block truncate text-xs font-bold ${mine ? 'text-cream' : 'text-olive-dark'}`}>
           {reply.guestId === meId ? 'Você' : reply.guestName}
         </span>
-        <span className={`flex items-center gap-1 text-xs ${mine ? 'text-cream/80' : 'text-ink-soft'}`}>
+        <span className={`flex min-w-0 items-center gap-1 text-xs ${mine ? 'text-cream/80' : 'text-ink-soft'}`}>
           {reply.thumbUrl && <Camera size={12} className="shrink-0" />}
-          <span className="truncate">{reply.deleted ? 'Mensagem apagada' : (reply.text ?? (reply.thumbUrl ? 'Foto' : ''))}</span>
+          <span className="min-w-0 truncate">{reply.deleted ? 'Mensagem apagada' : (reply.text ?? (reply.thumbUrl ? 'Foto' : ''))}</span>
         </span>
       </span>
       {reply.thumbUrl && <img src={reply.thumbUrl} alt="" className="size-9 shrink-0 rounded-md object-cover" />}
